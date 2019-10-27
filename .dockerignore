@@ -1,0 +1,6 @@
+*
+!target/*-runner
+!target/*-runner.jar
+!target/lib/*
+!apps/*-runner.jar
+!/target/*-runner.jar
