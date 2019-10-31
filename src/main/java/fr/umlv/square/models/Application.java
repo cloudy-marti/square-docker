@@ -12,10 +12,8 @@ public class Application {
 	private final int id;
 	private final String app;
 	private final int port;
-		
-	@JsonbProperty("service-port")
+	
 	private final int service_port;
-	@JsonbProperty("docker-instance")
 	private	 final String docker_instance;
 	
 	public Application(int id, String app, int port, int serv_port, String dock_instance) {
@@ -24,6 +22,28 @@ public class Application {
 		this.port = port;
 		this.service_port = serv_port;
 		this.docker_instance = dock_instance;
+	}
+	
+	public int getid() {
+		return id;
+	}
+	
+	public String getapp() {
+		return app;
+	}
+	
+	public int getport() {
+		return port;
+	}
+	
+	@JsonbProperty("service-port")
+	public int getserviceport() {
+		return service_port;
+	}
+	
+	@JsonbProperty("docker-instance")
+	public String getDockerInst() {
+		return docker_instance;
 	}
 	
 	public JsonObject toJson() {
