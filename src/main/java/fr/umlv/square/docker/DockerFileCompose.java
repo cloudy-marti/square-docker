@@ -42,7 +42,7 @@ public class DockerFileCompose {
     private void composeDockerFileBuffer() {
         StringBuilder str = new StringBuilder();
         str.append("FROM openjdk-11\n")
-                .append("EXPOSE ").append(application.getport()).append("\n")
+                .append("EXPOSE ").append(application.getserviceport()).append("\n")
                 .append("WORKDIR /workspace/\n")
                 .append("RUN [\"chmod\",\"+x\",\"/bin/").append(application.getapp()).append(".jar\"]\n")
                 .append("CMD [\"java\",\"-jar\",\"/bin/").append(application.getapp()).append(".jar\"]");
@@ -51,9 +51,13 @@ public class DockerFileCompose {
 
     public void composeDockerFile() throws IOException {
         composeDockerFileBuffer();
+
         dockerFileBufferedWriter.write(dockerFileBuffer);
+        dockerFileBufferedWriter.flush();
+        dockerFileBufferedWriter.close();
     }
 
+    /*
     public static void main(String[] args) throws IOException {
         Application demo = new Application(1, "hello", 8080, 8080, "docker");
 
@@ -64,4 +68,5 @@ public class DockerFileCompose {
 
         dockerFileCompose.composeDockerFile();
     }
+     */
 }
