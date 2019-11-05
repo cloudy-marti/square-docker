@@ -1,8 +1,9 @@
-package java.fr.umlv.square.docker;
+package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 public class Docker {
 
@@ -11,19 +12,20 @@ public class Docker {
      */
     private static final String buildCmdTemplate;
     private static final String runCmdTemplate;
+    private static final String stopCmdTemplate;
 
     static {
-        buildCmdTemplate = "build -f docker-images/%s.jvm -t quarkus/%s-jvm";
-        runCmdTemplate = "docker run -i --rm -p %s:%s quarkus/%s-jvm";
+            buildCmdTemplate = "docker build -f docker-images/%s.jvm -t quarkus/%s-jvm .";
+            runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
+            stopCmdTemplate = "docker container stop %s";
     }
 
     private final Application application;
-    private final String dockerId;
 
-    private final String osName;
 
     private final String[] buildCmd;
     private final String[] runCmd;
+    private final String[] stopCmd;
 
     private boolean running;
 
@@ -31,18 +33,12 @@ public class Docker {
         Objects.requireNonNull(application);
 
         this.application = application;
-        this.dockerId = application.getDockerInst();
 
-        this.osName = System.getProperty("os.name");
-
-        this.buildCmd = String.format(buildCmdTemplate, this.application.getapp(), this.application.getapp()).split(" ");
-        this.runCmd = String.format(runCmdTemplate, this.application.getport(), this.application.getserviceport(), this.application.getapp()).split(" ");
+        this.buildCmd = String.format(buildCmdTemplate, this.application.getAppName(), this.application.getAppName()).split(" ");
+        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getport(), this.application.getserviceport(), this.application.getAppName()).split(" ");
+        this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" "); // TO DO
 
         this.running = false;
-    }
-
-    public String getOsName() {
-        return this.osName;
     }
 
     public String[] getBuildCmd() {
@@ -51,5 +47,21 @@ public class Docker {
 
     public String[] getRunCmd() {
         return this.runCmd;
+    }
+
+    public String[] getStopCmd() {
+        return this.stopCmd;
+    }
+
+    public boolean isDockerRunning() {
+        return this.running;
+    }
+
+    public void run() {
+        this.running = true;
+    }
+
+    public void stop() {
+        this.running = false;
     }
 }
