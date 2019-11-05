@@ -1,51 +1,80 @@
-package java.fr.umlv.square.docker;
+package fr.umlv.square.docker;
 
+import fr.umlv.square.controllers.ApplicationsListRoute;
 import fr.umlv.square.models.Application;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class DockerDeploy {
+import java.lang.ProcessBuilder.Redirect;
+import java.util.stream.IntStream;
 
+public class DockerDeploy {
     /**
      * Static Methods with ProcessBuilder
      */
-    private ArrayList<Docker> dockerInstance;
+    /**
+     * private static non final not allowad, to change
+     */
+    private static ArrayList<Docker> dockerInstances = new ArrayList<>();
+    private static File dockerLog = new File("logs/dockerLog");
 
-    public static void buildDockerImage(Docker docker) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(docker.getBuildCmd());
-       /* processBuilder.redirectErrorStream(true);
-        processBuilder.redirectOutput(new File("logs/log"));
-
-        */
+    private static void createAndStartProcessBuilder(String[] cmdLine) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
+        processBuilder.redirectErrorStream(true);
+        processBuilder.redirectOutput(Redirect.appendTo(dockerLog));
         processBuilder.start();
     }
 
-    public static Docker runDockerImage(Docker docker) {
-        String[] cmdLine = docker.getRunCmd();
-        return new Docker(new Application(1, "a", 1, 1, "b"));
+    private static void buildDockerImage(Docker docker) throws IOException {
+        createAndStartProcessBuilder(docker.getBuildCmd());
     }
 
-    public static void main (String[] args) throws IOException {
+    private static void runDockerImage(Docker docker) throws IOException {
+        createAndStartProcessBuilder(docker.getRunCmd());
 
-        Application application = new Application(1, "hello", 8080, 8080, "docker");
-        /*
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
-        dockerFileCompose.composeDockerFile();
-
-         */
-
-        Docker docker = new Docker(application);
-        /*int index = 0;
-        while(index < docker.getBuildCmd().length) {
-            System.out.print(docker.getBuildCmd()[index] + " ");
-            index++;
-        }
-
-         */
-
-        buildDockerImage(docker);
-
+        docker.run();
+        addToDockerListing(docker);
     }
+
+    public static void stopDockerImage(Docker docker) throws IOException {
+        docker.stop();
+        removeDockerFromListing(docker);
+    }
+
+    private static void addToDockerListing(Docker docker) {
+        dockerInstances.add(docker);
+    }
+
+    private static void removeDockerFromListing(Docker docker) {
+        dockerInstances.remove(docker);
+    }
+
+
+    public static void main (String[] args) {
+
+        /*ApplicationsListRoute apps = new ApplicationsListRoute();
+
+        IntStream.range(0, apps.list().size()).forEach(index -> {
+
+            Application tmp = apps.list().get(index);
+
+            try {
+                DockerFileCompose dockerFileCompose = new DockerFileCompose(tmp);
+                dockerFileCompose.composeDockerFile();
+
+                Docker docker = new Docker(tmp);
+
+                buildDockerImage(docker);
+                runDockerImage(docker);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+         */
+    }
+
 
 }
