@@ -54,7 +54,7 @@ public class DockerDeploy {
 
     public static void main (String[] args) throws IOException {
 
-        Application application = new Application(1, "appli_demo-runner:8080", "appli_demo-runner.jar", 8080, 8080, "docker");
+        /*Application application = new Application(1, "appli_demo-runner:8080", "appli_demo-runner.jar", 15202, 8080, "docker-2");
 
         DockerFileCompose dockerFile = new DockerFileCompose(application);
         dockerFile.composeDockerFile();
@@ -64,26 +64,32 @@ public class DockerDeploy {
         buildDockerImage(docker);
         runDockerImage(docker);
 
-        /*ApplicationsListRoute apps = new ApplicationsListRoute();
+         */
 
-        IntStream.range(0, apps.list().size()).forEach(index -> {
+        ArrayList<Application> apps = new ArrayList<>();
 
-            Application tmp = apps.list().get(index);
+        apps.add(new Application(201,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15201,"demo-12"));
+        apps.add(new Application(202,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15202,"demo-13"));
+        apps.add(new Application(203,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15203,"demo-14"));
+
+        IntStream.range(0, apps.size()).forEach(index -> {
+
+            Application tmp = apps.get(index);
 
             try {
                 DockerFileCompose dockerFileCompose = new DockerFileCompose(tmp);
                 dockerFileCompose.composeDockerFile();
 
-                Docker docker = new Docker(tmp);
+                Docker docker2 = new Docker(tmp);
 
-                buildDockerImage(docker);
-                runDockerImage(docker);
+                buildDockerImage(docker2);
+                runDockerImage(docker2);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
-         */
+
     }
 
 
