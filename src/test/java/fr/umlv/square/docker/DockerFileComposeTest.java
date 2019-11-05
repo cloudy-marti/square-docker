@@ -49,7 +49,7 @@ public class DockerFileComposeTest {
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
 
-        String tmp =    "FROM openjdk-11\n" +
+        String tmp =    "FROM openjdk:11\n" +
                         "EXPOSE 8080\n" +
                         "WORKDIR /workspace/\n" +
                         "COPY apps/hello.jar hello.jar\n" +

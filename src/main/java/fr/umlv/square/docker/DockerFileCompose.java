@@ -15,6 +15,10 @@ import java.util.Objects;
  *
  * To determine : should we use docker-compose ?
  * Using yaml : https://www.baeldung.com/java-snake-yaml question mark
+ *
+ * This class is linked to an Application :
+ *  - One dockerfile will be used for all instances of docker-container with same app
+ *
  */
 public class DockerFileCompose {
 
@@ -31,7 +35,7 @@ public class DockerFileCompose {
      */
     static {
         dockerFileTemplate =
-                "FROM openjdk-11\n" +                                       // base image
+                "FROM openjdk:11\n" +                                       // base image
                 "EXPOSE %s\n" +                                             // docker port exposed to host
                 "WORKDIR /workspace/\n" +                                   // workspace directory
                 "COPY apps/%s.jar %s.jar\n" +                               // copy app into docker's workspace
@@ -81,6 +85,6 @@ public class DockerFileCompose {
 
         dockerFileCompose.composeDockerFile();
     }
-    
+
      */
 }
