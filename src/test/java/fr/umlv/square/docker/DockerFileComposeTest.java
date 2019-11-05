@@ -1,7 +1,6 @@
 package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
-import org.apache.groovy.json.internal.IO;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
