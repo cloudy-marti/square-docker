@@ -7,7 +7,7 @@
 # Using a JDK-11 -latest version compatible with Quarkus- base image.
 #
 # DOCKER BUILD command :
-# sudo dockebuild -f docker-images/Dockerfile.jvm -t quarkus/projectsquare-jvm .
+# sudo docker build -f docker-images/Dockerfile.jvm -t quarkus/projectsquare-jvm .
 #
 # DOCKER RUN command :
 # sudo docker run -i --rm -p 8080:8080 quarkus/projectsquare-jvm
@@ -18,4 +18,4 @@ FROM openjdk:11
 COPY apps/appli_demo-runner.jar /workspace/demo.jar
 EXPOSE 8080
 RUN ["chmod","+x","workspace/demo.jar"]
-ENTRYPOINT ["java","-jar","workspace/demo.jar"]
+CMD java -jar workspace/demo.jar > workspace/log.log 2>&1
