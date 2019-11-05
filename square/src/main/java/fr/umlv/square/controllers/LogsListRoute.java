@@ -24,9 +24,9 @@ public class LogsListRoute {
 
 	private List<LogsApplication> list = new ArrayList<LogsApplication>();
 	public LogsListRoute() {
-		Application a = new Application(201,"todomvc:8082",8082,15201,"todomvc-12");
-		Application b = new Application(202,"todomvc:8082",8082,15202,"todomvc-13");
-		Application c = new Application(203,"todomvc:8082",8082,15203,"todomvc-14");
+		Application a = new Application(201,"todomvc:8082", "todomvc", 8082,15201,"todomvc-12");
+		Application b = new Application(202,"todomvc:8082", "todomvc",8082,15202,"todomvc-13");
+		Application c = new Application(203,"todomvc:8082", "todomvc",8082,15203,"todomvc-14");
 
 		list.add(new LogsApplication(a, "message de test", "2019-10-15T23:58:00.000Z"));
 		list.add(new LogsApplication(b, "message de test", "2019-11-15T23:58:00.000Z"));
