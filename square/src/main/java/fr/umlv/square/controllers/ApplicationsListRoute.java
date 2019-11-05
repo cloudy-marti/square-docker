@@ -20,9 +20,9 @@ public class ApplicationsListRoute {
 	private static ArrayList<Application> list = new ArrayList<Application>();
 	
 	public ApplicationsListRoute() {
-		list.add(new Application(201,"todomvc:8082",8082,15201,"todomvc-12"));
-		list.add(new Application(202,"todomvc:8082",8082,15202,"todomvc-13"));
-		list.add(new Application(203,"todomvc:8082",8082,15203,"todomvc-14"));
+		list.add(new Application(201,"todomvc:8082", "todomvc", 8082,15201,"todomvc-12"));
+		list.add(new Application(202,"todomvc:8082", "todomvc", 8082,15202,"todomvc-13"));
+		list.add(new Application(203,"todomvc:8082", "todomvc", 8082,15203,"todomvc-14"));
 
 	}
 	
