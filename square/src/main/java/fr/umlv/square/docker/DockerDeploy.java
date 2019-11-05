@@ -52,7 +52,17 @@ public class DockerDeploy {
     }
 
 
-    public static void main (String[] args) {
+    public static void main (String[] args) throws IOException {
+
+        Application application = new Application(1, "appli_demo-runner:8080", "appli_demo-runner.jar", 8080, 8080, "docker");
+
+        DockerFileCompose dockerFile = new DockerFileCompose(application);
+        dockerFile.composeDockerFile();
+
+        Docker docker = new Docker(application);
+
+        buildDockerImage(docker);
+        runDockerImage(docker);
 
         /*ApplicationsListRoute apps = new ApplicationsListRoute();
 
