@@ -19,6 +19,10 @@ import fr.umlv.square.models.LogsApplication;
 
 
 
+
+
+
+
 @Path("/logs")
 public class LogsListRoute {
 
@@ -39,7 +43,7 @@ public class LogsListRoute {
 	public Response getTime(@PathParam("time") int time) {
 		System.out.println(time);
 		 
-		return Response.status(200).entity(LogsApplication.getListMapped(list)).build() ;
+		return Response.status(200).entity(LogsApplication.getListMapped(list)).build();
 	}
 	
 	@Path("/{time}/{filter}")
@@ -55,7 +59,7 @@ public class LogsListRoute {
 	@POST	
     @Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-    public Response deploy(JsonObject obj) {
+    public Response logs(List<JsonObject> obj) {
 		 System.out.println("i received Logs !");
 		 System.out.println(obj.toString());
          return Response.status(Status.CREATED).entity(list.get(1)).build();
