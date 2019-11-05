@@ -22,17 +22,17 @@ public class DockerFileComposeTest {
 
     @Test
     void assertDockerFileComposeGetsTheRightPath() throws IOException {
-        Application application = new Application(1, "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello:8080", "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
-        String tmp = "docker-images/" + application.getapp() + ".jvm";
+        String tmp = "docker-images/" + application.getAppName() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
     }
 
     @Test
     void assertDockerFileComposeCreatesADockerFile () throws IOException {
-        Application application = new Application(1, "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello:8080", "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
@@ -44,7 +44,7 @@ public class DockerFileComposeTest {
 
     @Test
     void assertDockerFileComposeWritesTheRightDockerFile () throws IOException {
-        Application application = new Application(1, "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello", "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
@@ -52,9 +52,9 @@ public class DockerFileComposeTest {
         String tmp =    "FROM openjdk:11\n" +
                         "EXPOSE 8080\n" +
                         "WORKDIR /workspace/\n" +
-                        "COPY apps/hello.jar hello.jar\n" +
-                        "RUN [\"chmod\",\"+x\",\"hello.jar\"]\n" +
-                        "CMD \"java\",\"-jar\",\"hello.jar > log.log 2>&1\"";
+                        "COPY apps/hello /workspace/hello\n" +
+                        "RUN [\"chmod\",\"+x\",\"hello\"]\n" +
+                        "CMD [\"java\",\"-jar\",\"hello\",\">\",\"log.log\",\"2>&1\"]";
 
         Scanner scanner = new Scanner(new File(dockerFileCompose.getDockerFilePath()));
         StringJoiner str = new StringJoiner("\n");
