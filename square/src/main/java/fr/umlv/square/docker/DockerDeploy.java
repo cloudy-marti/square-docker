@@ -1,9 +1,7 @@
-package fr.umlv.square.docker;
+package java.fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
 
-import javax.print.Doc;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 

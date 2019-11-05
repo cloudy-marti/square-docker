@@ -1,4 +1,4 @@
-package fr.umlv.square.docker;
+package java.fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
 
