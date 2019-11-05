@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
+import java.util.StringJoiner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +25,7 @@ public class DockerFileComposeTest {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
-        String tmp = "docker-images/" + application.getapp() + "Docker";
+        String tmp = "docker-images/" + application.getapp() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
     }
@@ -38,23 +40,28 @@ public class DockerFileComposeTest {
         Path path = Paths.get(dockerFileCompose.getDockerFilePath());
 
         assertTrue(Files.exists(path));
-        //File tmpFile = new File(dockerFileCompose.getDockerFilePath());
     }
 
     @Test
-    void assertDockerFileComposeWritesADockerFile () throws IOException {
+    void assertDockerFileComposeWritesTheRightDockerFile () throws IOException {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
 
-        String tmp = "FROM openjdk-11\n" +
-                "EXPOSE 8080\n" +
-                "WORKDIR /workspace/\n" +
-                "RUN [\"chmod\",\"+x\",\"/bin/hello.jar\"]\n" +
-                "CMD [\"java\",\"-jar\",\"/bin/hello.jar\"]";
+        String tmp =    "FROM openjdk-11\n" +
+                        "EXPOSE 8080\n" +
+                        "WORKDIR /workspace/\n" +
+                        "COPY apps/hello.jar hello.jar\n" +
+                        "RUN [\"chmod\",\"+x\",\"hello.jar\"]\n" +
+                        "CMD \"java\",\"-jar\",\"hello.jar > log.log 2>&1\"";
 
-        File tmpFile = new File(dockerFileCompose.getDockerFilePath());
-        assertTrue(tmpFile.exists());
+        Scanner scanner = new Scanner(new File(dockerFileCompose.getDockerFilePath()));
+        StringJoiner str = new StringJoiner("\n");
+        while(scanner.hasNext()) {
+            str.add(scanner.nextLine());
+        }
+
+        assertEquals(tmp, str.toString());
     }
 }

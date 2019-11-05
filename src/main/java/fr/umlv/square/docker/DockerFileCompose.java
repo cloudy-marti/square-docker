@@ -18,17 +18,32 @@ import java.util.Objects;
  */
 public class DockerFileCompose {
 
+    private static final String dockerFileTemplate;
+
     private final Application application;
 
     private final String dockerFilePath;
     private final FileWriter dockerFileBufferedWriter;
     private String dockerFileBuffer;
 
+    /**
+     * Make template once with the first instantiation / static method call
+     */
+    static {
+        dockerFileTemplate =
+                "FROM openjdk-11\n" +                                       // base image
+                "EXPOSE %s\n" +                                             // docker port exposed to host
+                "WORKDIR /workspace/\n" +                                   // workspace directory
+                "COPY apps/%s.jar %s.jar\n" +                               // copy app into docker's workspace
+                "RUN [\"chmod\",\"+x\",\"%s.jar\"]\n" +                     // give exec permissions to .jar file
+                "CMD \"java\",\"-jar\",\"%s.jar > log.log 2>&1\"";          // command to be executed when docker starts running
+    }
+
     public DockerFileCompose(Application application) throws IOException {
         Objects.requireNonNull(application);
 
         this.application = application;
-        this.dockerFilePath = "docker-images/" + this.application.getapp() + "Docker";
+        this.dockerFilePath = "docker-images/" + this.application.getapp() + ".jvm";
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
 
@@ -40,15 +55,13 @@ public class DockerFileCompose {
      * Write DockerFile in a buffer
      */
     private void composeDockerFileBuffer() {
-        StringBuilder str = new StringBuilder();
-        str.append("FROM openjdk-11\n")
-                .append("EXPOSE ").append(application.getserviceport()).append("\n")
-                .append("WORKDIR /workspace/\n")
-                .append("RUN [\"chmod\",\"+x\",\"/bin/").append(application.getapp()).append(".jar\"]\n")
-                .append("CMD [\"java\",\"-jar\",\"/bin/").append(application.getapp()).append(".jar\"]");
-        dockerFileBuffer = str.toString();
+        dockerFileBuffer = String.format(dockerFileTemplate, application.getserviceport(), application.getapp(), application.getapp(), application.getapp(), application.getapp());
     }
 
+    /**
+     * Write dockerfile buffer in a file
+     * @throws IOException
+     */
     public void composeDockerFile() throws IOException {
         composeDockerFileBuffer();
 
@@ -68,5 +81,6 @@ public class DockerFileCompose {
 
         dockerFileCompose.composeDockerFile();
     }
+    
      */
 }
