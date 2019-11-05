@@ -1,0 +1,5 @@
+FROM openjdk-11
+EXPOSE 8080
+WORKDIR /workspace/
+RUN ["chmod","+x","/bin/hello.jar"]
+CMD ["java","-jar","/bin/hello.jar"]
