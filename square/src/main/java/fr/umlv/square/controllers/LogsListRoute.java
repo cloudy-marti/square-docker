@@ -10,6 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -59,8 +60,8 @@ public class LogsListRoute {
 	@POST	
     @Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-    public Response logs(List<JsonObject> obj) {
-		 System.out.println("i received Logs !");
+    public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
+		 System.out.println("i received Logs from " + id + " !");
 		 System.out.println(obj.toString());
          return Response.status(Status.CREATED).entity(list.get(1)).build();
     }
