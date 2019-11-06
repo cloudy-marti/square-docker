@@ -10,14 +10,16 @@
 # sudo docker build -f docker-images/helloDocker.jvm -t quarkus/projectsquare-jvm .
 #
 # DOCKER RUN command :
-# sudo docker run -i --rm -p 8080:8080 quarkus/projectsquare-jvm
+# sudo docker run -i --rm -p 8081:8080 quarkus/projectsquare-jvm
 #
 ###
 
 FROM openjdk:11
-EXPOSE 8080
-COPY apps/lib_cliente-runner.jar /workspace/lib.jar
+EXPOSE 8081
+COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar
 COPY apps/appli_demo-runner.jar /workspace/demo.jar
+COPY logs/default.log /workspace/log.log
+RUN ["chmod","+rw","workspace/log.log"]
 RUN ["chmod","+x","workspace/demo.jar"]
 RUN ["chmod","+x","workspace/lib.jar"]
 
