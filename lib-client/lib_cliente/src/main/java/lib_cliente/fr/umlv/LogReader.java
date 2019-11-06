@@ -33,7 +33,7 @@ import javax.json.bind.JsonbBuilder;
 public class LogReader {
 	private ArrayList<Log> array;
 	private Long read = 0L;
-	private final int id;
+	private final String id;
 	
 
 	public LogReader() {
@@ -41,8 +41,8 @@ public class LogReader {
 		this.array = new ArrayList<Log>();
 	}
 
-	private int setId() {
-		int res = -1;
+	private String setId() {
+		String res = "";
 		ProcessBuilder pb = new ProcessBuilder("hostname");
 		Process proc;
 		try {
@@ -53,9 +53,9 @@ public class LogReader {
 		InputStream inputStr = proc.getInputStream();
 		try (java.util.Scanner scan = new java.util.Scanner(inputStr)) {
 			String str = scan.useDelimiter("\\A").hasNext() ? scan.next() : "";
-			res = Integer.parseInt(str);
+			res = str;
 		}
-		return res;
+		return res.replaceAll("[\r\n]+", "");
  	}
 
 	public void parse(String str, LocalDateTime time) {
@@ -66,10 +66,14 @@ public class LogReader {
 		LocalDateTime time = LocalDateTime.now();
 		stream.skip(read).forEach(e -> this.parse(e, time));
 		sendData();
+		read += Long.valueOf(array.size());
+		array.clear();
 
 	}
 
 	private void sendData() {
+		if(array.size()==0)
+			return;
 		String obj = JsonbBuilder.create().toJson(this.array);
         InetAddress inetAddress;
 		try {
@@ -77,8 +81,10 @@ public class LogReader {
 		} catch (UnknownHostException e1) {
 			throw new UndeclaredThrowableException(e1);
 		}
+		URI uriC = URI.create("http://172.22.253.204:8080/logs?idC=" + id);
+		System.out.println(uriC.toString());
 		HttpRequest requetePost = HttpRequest.newBuilder()
-				.uri(URI.create("http://" + inetAddress.getHostAddress() + ":8080/logs"))
+				.uri(uriC)
 				.setHeader("Content-Type", "application/json")
 				.POST(BodyPublishers.ofString(obj))
 				.build();
@@ -86,10 +92,6 @@ public class LogReader {
 		HttpClient req = HttpClient.newHttpClient();
 		try {
 			HttpResponse<String> response = req.send(requetePost, BodyHandlers.ofString());
-			System.out.println("Status  : " + response.statusCode());
-			System.out.println("Headers : " + response.headers());
-			System.out.println("Body    : " + response.body());
-
 		} catch (IOException | InterruptedException e) {
 			throw new UndeclaredThrowableException(e);
 		}

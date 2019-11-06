@@ -1,6 +1,7 @@
 package lib_cliente.fr.umlv;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,7 +16,9 @@ import io.quarkus.runtime.StartupEvent;
 public class AppLifecycleBean {
 	void onStart(@Observes StartupEvent ev) {
 		LogReader lr = new LogReader();
-		String fileName = "./log.log";
+		String fileName = "workspace/log.log";
+		
+		
 		Thread mainT = new Thread(() -> {
 			while (true) {
 				try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
