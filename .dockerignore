@@ -3,4 +3,6 @@
 !target/*-runner.jar
 !target/lib/*
 !apps/*-runner.jar
-!/target/*-runner.jar
+!target/*-runner.jar
+!logs/*.log
+!lib-client/*.jar
