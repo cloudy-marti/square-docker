@@ -3,40 +3,27 @@ package lib_cliente.fr.umlv;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.InetAddress;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.concurrent.Flow.Subscriber;
 import java.util.stream.Stream;
-
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
-import javax.json.JsonValue.ValueType;
 import javax.json.bind.JsonbBuilder;
 
 public class LogReader {
 	private ArrayList<Log> array;
 	private Long read = 0L;
 	private final String id;
+	private final String localIP;
+	private final int portSquare;
 	
 
 	public LogReader() {
+		localIP = "192.168.1.67";
+		portSquare = 8080;
 		id = setId();
 		this.array = new ArrayList<Log>();
 	}
@@ -75,14 +62,7 @@ public class LogReader {
 		if(array.size()==0)
 			return;
 		String obj = JsonbBuilder.create().toJson(this.array);
-        InetAddress inetAddress;
-		try {
-			inetAddress = InetAddress.getLocalHost();
-		} catch (UnknownHostException e1) {
-			throw new UndeclaredThrowableException(e1);
-		}
-		URI uriC = URI.create("http://172.22.253.204:8080/logs?idC=" + id);
-		System.out.println(uriC.toString());
+		URI uriC = URI.create("http://"+localIP+":"+portSquare+"/logs?idC=" + id);
 		HttpRequest requetePost = HttpRequest.newBuilder()
 				.uri(uriC)
 				.setHeader("Content-Type", "application/json")
@@ -91,7 +71,7 @@ public class LogReader {
 
 		HttpClient req = HttpClient.newHttpClient();
 		try {
-			HttpResponse<String> response = req.send(requetePost, BodyHandlers.ofString());
+			req.send(requetePost, BodyHandlers.ofString());
 		} catch (IOException | InterruptedException e) {
 			throw new UndeclaredThrowableException(e);
 		}
