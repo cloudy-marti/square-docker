@@ -18,10 +18,10 @@ FROM openjdk:11
 EXPOSE 8080
 COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar
 COPY apps/appli_demo-runner.jar /workspace/demo.jar
-COPY docker-images/script.sh /script.sh
+COPY docker-images/script.sh /workspace/script.sh
 
 RUN ["chmod","+x","workspace/demo.jar"]
 RUN ["chmod","+x","workspace/lib.jar"]
-RUN ["chmod","+x","script.sh"]
+RUN ["chmod","+x","workspace/script.sh"]
 
 CMD java -jar /workspace/lib.jar 

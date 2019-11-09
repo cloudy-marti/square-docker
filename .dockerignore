@@ -6,3 +6,4 @@
 !target/*-runner.jar
 !logs/*.log
 !lib-client/*.jar
+!docker-images/*.sh
