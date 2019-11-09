@@ -15,13 +15,12 @@ public class Docker {
     private static final String stopCmdTemplate;
 
     static {
-            buildCmdTemplate = "docker build -f docker-images/%s.jvm -t quarkus/%s-jvm .";
+            buildCmdTemplate = "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm .";
             runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
             stopCmdTemplate = "docker container stop %s";
     }
 
     private final Application application;
-
 
     private final String[] buildCmd;
     private final String[] runCmd;
@@ -34,8 +33,8 @@ public class Docker {
 
         this.application = application;
 
-        this.buildCmd = String.format(buildCmdTemplate, this.application.getAppName(), this.application.getAppName()).split(" ");
-        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getAppName()).split(" ");
+        this.buildCmd = String.format(buildCmdTemplate, this.application.getapp(), this.application.getapp()).split(" ");
+        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getapp()).split(" ");
         this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" "); // TO DO
 
         this.running = false;

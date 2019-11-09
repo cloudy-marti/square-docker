@@ -21,19 +21,19 @@ public class DockerFileCompose {
      */
     static {
         dockerFileTemplate =
-                "FROM openjdk:11\n" +                                           // base image
-                "EXPOSE %s\n" +                                                 // docker port exposed to host
-                "WORKDIR /workspace/\n" +                                       // workspace directory
-                "COPY apps/%s /workspace/%s\n" +                                // copy app into docker's workspace
-                "RUN [\"chmod\",\"+x\",\"%s\"]\n" +                             // give exec permissions to .jar file
-                "CMD [\"java\",\"-jar\",\"%s\",\">\",\"log.log\",\"2>&1\"]";    // command to be executed when docker starts running
+                "FROM openjdk:11\n" +                       // base image
+                "EXPOSE %s\n" +                             // docker port exposed to host
+                "WORKDIR /workspace/\n" +                   // workspace directory
+                "COPY apps/%s /workspace/%s\n" +            // copy app into docker's workspace
+                "RUN [\"chmod\",\"+x\",\"%s\"]\n" +         // give exec permissions to .jar file
+                "CMD java -jar %s > log.log 2>&1";          // command to be executed when docker starts running
     }
 
     public DockerFileCompose(Application application) throws IOException {
         Objects.requireNonNull(application);
 
         this.application = application;
-        this.dockerFilePath = "docker-images/" + this.application.getAppName() + ".jvm";
+        this.dockerFilePath = "../docker-images/" + this.application.getapp() + ".jvm";
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
 
@@ -44,10 +44,10 @@ public class DockerFileCompose {
     private void composeDockerFileBuffer() {
         dockerFileBuffer = String.format(dockerFileTemplate,
                 application.getport(),
-                application.getAppName(),
-                application.getAppName(),
-                application.getAppName(),
-                application.getAppName());
+                application.getapp(),
+                application.getapp(),
+                application.getapp(),
+                application.getapp());
     }
 
     /**

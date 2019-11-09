@@ -1,6 +1,5 @@
 package fr.umlv.square.docker;
 
-import fr.umlv.square.controllers.ApplicationsListRoute;
 import fr.umlv.square.models.Application;
 
 import java.io.File;
@@ -18,7 +17,7 @@ public class DockerDeploy {
      * private static non final not allowad, to change
      */
     private static ArrayList<Docker> dockerInstances = new ArrayList<>();
-    private static File dockerLog = new File("logs/dockerLog");
+    private static File dockerLog = new File("../logs/dockerLog");
 
     private static void createAndStartProcessBuilder(String[] cmdLine) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
@@ -52,9 +51,9 @@ public class DockerDeploy {
     }
 
 
-    public static void main (String[] args) throws IOException {
+    public static void main (String[] args) {
 
-        /*Application application = new Application(1, "appli_demo-runner:8080", "appli_demo-runner.jar", 15202, 8080, "docker-2");
+        /*Application application = new Application(1, "appli_demo-runner:8080", 15202, 8080, "docker-2");
 
         DockerFileCompose dockerFile = new DockerFileCompose(application);
         dockerFile.composeDockerFile();
@@ -68,9 +67,11 @@ public class DockerDeploy {
 
         ArrayList<Application> apps = new ArrayList<>();
 
-        apps.add(new Application(201,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15201,"demo-12"));
-        apps.add(new Application(202,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15202,"demo-13"));
-        apps.add(new Application(203,"appli_demo-runner:8082", "appli_demo-runner.jar", 8082,15203,"demo-14"));
+       /* apps.add(new Application(201,"appli_demo-runner",8082, 15201, "demo-12"));
+        apps.add(new Application(202,"appli_demo-runner:8082", 8082, 15202, "demo-13"));
+
+        */
+        apps.add(new Application(203,"appli_demo-runner ", 8085,9000,"demo-16"));
 
         IntStream.range(0, apps.size()).forEach(index -> {
 
@@ -88,8 +89,6 @@ public class DockerDeploy {
                 e.printStackTrace();
             }
         });
-
-
     }
 
 
