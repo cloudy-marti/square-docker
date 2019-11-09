@@ -24,4 +24,4 @@ RUN ["chmod","+x","workspace/demo.jar"]
 RUN ["chmod","+x","workspace/lib.jar"]
 RUN ["chmod","+x","workspace/script.sh"]
 
-CMD java -jar /workspace/lib.jar 
+CMD ["bash", "workspace/script.sh"]
