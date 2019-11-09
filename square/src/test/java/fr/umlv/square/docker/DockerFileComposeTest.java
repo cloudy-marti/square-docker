@@ -22,17 +22,17 @@ public class DockerFileComposeTest {
 
     @Test
     void assertDockerFileComposeGetsTheRightPath() throws IOException {
-        Application application = new Application(1, "hello:8080", "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
-        String tmp = "docker-images/" + application.getAppName() + ".jvm";
+        String tmp = "../docker-images/" + application.getapp() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
     }
 
     @Test
     void assertDockerFileComposeCreatesADockerFile () throws IOException {
-        Application application = new Application(1, "hello:8080", "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello",8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
@@ -44,7 +44,7 @@ public class DockerFileComposeTest {
 
     @Test
     void assertDockerFileComposeWritesTheRightDockerFile () throws IOException {
-        Application application = new Application(1, "hello", "hello", 8080, 8080, "docker");
+        Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
         dockerFileCompose.composeDockerFile();
