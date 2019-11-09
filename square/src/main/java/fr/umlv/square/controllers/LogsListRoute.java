@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.JsonObject;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import fr.umlv.square.database.logs.Log;
 import fr.umlv.square.models.Application;
 import fr.umlv.square.models.LogsApplication;
 
@@ -29,9 +31,9 @@ public class LogsListRoute {
 
 	private List<LogsApplication> list = new ArrayList<LogsApplication>();
 	public LogsListRoute() {
-		Application a = new Application(201,"todomvc:8082", "todomvc", 8082,15201,"todomvc-12");
-		Application b = new Application(202,"todomvc:8082", "todomvc",8082,15202,"todomvc-13");
-		Application c = new Application(203,"todomvc:8082", "todomvc",8082,15203,"todomvc-14");
+		Application a = new Application(201,"todomvc", 8082,15201,"todomvc-12");
+		Application b = new Application(202,"todomvc",8082,15202,"todomvc-13");
+		Application c = new Application(203,"todomvc",8082,15203,"todomvc-14");
 
 		list.add(new LogsApplication(a, "message de test", "2019-10-15T23:58:00.000Z"));
 		list.add(new LogsApplication(b, "message de test", "2019-11-15T23:58:00.000Z"));
@@ -60,9 +62,10 @@ public class LogsListRoute {
 	@POST	
     @Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Transactional
     public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
 		 System.out.println("i received Logs from " + id + " !");
-		 System.out.println(obj.toString());
+		 Log.addLogs(obj, "monApp1");
          return Response.status(Status.CREATED).entity(list.get(1)).build();
     }
 }

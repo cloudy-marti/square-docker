@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.persistence.Entity;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 public class LogsApplication {
 	private final Application app;
 	private final String message;
