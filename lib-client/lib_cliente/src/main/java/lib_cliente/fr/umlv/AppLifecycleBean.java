@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -23,8 +24,13 @@ public class AppLifecycleBean {
 			while (true) {
 				try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 					lr.readStream(stream);
+				} catch (IOException e) {
+					if(!(e instanceof NoSuchFileException))
+						throw new UndeclaredThrowableException(e);	
+				}
+				try {
 					Thread.sleep(15_000);
-				} catch (IOException | InterruptedException e) {
+				} catch (InterruptedException e) {
 					throw new UndeclaredThrowableException(e);
 				}
 			}
