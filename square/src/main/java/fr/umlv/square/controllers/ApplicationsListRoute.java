@@ -20,9 +20,9 @@ public class ApplicationsListRoute {
 	private static ArrayList<Application> list = new ArrayList<Application>();
 	
 	public ApplicationsListRoute() {
-		list.add(new Application(201,"todomvc", 8082,15201,"todomvc-12"));
+		list.add(new Application(201,"todomvc",8082,15201,"todomvc-12"));
 		list.add(new Application(202,"todomvc",8082,15202,"todomvc-13"));
-		list.add(new Application(203,"todomvc", 8082,15203,"todomvc-14"));
+		list.add(new Application(203,"todomvc",8082,15203,"todomvc-14"));
 
 	}
 	
@@ -35,11 +35,19 @@ public class ApplicationsListRoute {
 	
 	@Path("/deploy")
 	@POST	
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
-		 System.out.println("\nLancement du Docker de l'app " + obj.get("app"));
-         return Response.status(Status.CREATED).entity(list.get(1)).build();
+		String str;
+		String array[];
+		 try {
+			 str = obj.get("app").toString();
+			 array = str.split(":");
+			 list.add(new Application(204,array[0],Integer.parseInt(array[1]),15204,"le nom"));
+		 }catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
+			 return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+		 }
+		 return Response.status(Status.CREATED).build();
     }
 	
 	@Path("/stop")
