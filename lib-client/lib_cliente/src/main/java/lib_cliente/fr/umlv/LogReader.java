@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class LogReader {
 	}
 
 	public void readStream(Stream<String> stream) {
+		System.out.println("okk");
 		LocalDateTime time = LocalDateTime.now();
 		stream.skip(read).forEach(e -> this.parse(e, time));
 		sendData();
@@ -58,22 +60,24 @@ public class LogReader {
 
 	}
 
-	private void sendData() {
-		if(array.size()==0)
-			return;
-		String obj = JsonbBuilder.create().toJson(this.array);
-		URI uriC = URI.create("http://"+localIP+":"+portSquare+"/logs?idC=" + id);
-		HttpRequest requetePost = HttpRequest.newBuilder()
-				.uri(uriC)
-				.setHeader("Content-Type", "application/json")
-				.POST(BodyPublishers.ofString(obj))
-				.build();
-
-		HttpClient req = HttpClient.newHttpClient();
-		try {
-			req.send(requetePost, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			throw new UndeclaredThrowableException(e);
+		private void sendData() {
+			System.out.println(array.size());
+			if(array.size()==0)
+				return;
+			String obj = JsonbBuilder.create().toJson(this.array);
+			URI uriC = URI.create("http://"+localIP+":"+portSquare+"/logs?idC=" + id);
+			HttpRequest requetePost = HttpRequest.newBuilder()
+					.uri(uriC)
+					.setHeader("Content-Type", "application/json")
+					.POST(BodyPublishers.ofString(obj))
+					.build();
+	
+			HttpClient req = HttpClient.newHttpClient();
+			try {
+				HttpResponse a = req.send(requetePost, BodyHandlers.ofString());
+				System.out.println(a.statusCode());
+			} catch (IOException | InterruptedException e) {
+				throw new UndeclaredThrowableException(e);
+			}
 		}
-	}
 }
