@@ -2,26 +2,28 @@
 #
 # Developers : MARTI Emilie and FAU Nicolas
 #
-# Dockerfile to build a container that runs a Quarkus application in JVM mode
-#
-# Using a JDK-11 -latest version compatible with Quarkus- base image.
-#
-# DOCKER BUILD command :
-# sudo docker build -f docker-images/helloDocker.jvm -t quarkus/projectsquare-jvm .
-#
-# DOCKER RUN command :
-# sudo docker run -i --rm --name hello -p 8081:8080 quarkus/projectsquare-jvm
+# This is the DockerFile Template to be used for testing outside of java App
 #
 ###
 
+# Base image giving openjdk environment
 FROM openjdk:11
+
+# Docker port exposed
 EXPOSE 8080
+
+# Copy App files and Script file
 COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar
 COPY apps/appli_demo-runner.jar /workspace/demo.jar
 COPY docker-images/script.sh /workspace/script.sh
 
+# Give permission to execute
 RUN ["chmod","+x","workspace/demo.jar"]
 RUN ["chmod","+x","workspace/lib.jar"]
 RUN ["chmod","+x","workspace/script.sh"]
 
-CMD ["bash", "workspace/script.sh"]
+# Remove annoying '\r' Windows characters when writing the script on Windows
+RUN ["sed", "-i", "s/\r$//g", "workspace/script.sh"]
+
+# Run script with bash - Name of demo-app given as a parameter
+CMD ["bash", "workspace/script.sh", "demo"]
