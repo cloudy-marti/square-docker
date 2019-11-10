@@ -20,12 +20,6 @@ import fr.umlv.square.database.logs.Log;
 import fr.umlv.square.models.Application;
 import fr.umlv.square.models.LogsApplication;
 
-
-
-
-
-
-
 @Path("/logs")
 public class LogsListRoute {
 
