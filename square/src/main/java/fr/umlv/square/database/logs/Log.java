@@ -1,49 +1,68 @@
 package fr.umlv.square.database.logs;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
-import static javax.persistence.GenerationType.SEQUENCE;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.TimeZone;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 @Entity
 public class Log extends PanacheEntity {
     @NotBlank
-	public final String appName;
+    public String message;
     @NotBlank
-    public final String message;
+    public OffsetDateTime timestamp;
     @NotBlank
-    public final String timestamp;
+	public String dockerInstance;
 	
-	private Log(String appName, String message, String timestamp) {
-		this.appName = appName;
+	private Log(String dockerI, String message, OffsetDateTime timestamp) {
+		Objects.requireNonNull(dockerI);
+		Objects.requireNonNull(message);
+		Objects.requireNonNull(timestamp);
 		this.message = message;
 		this.timestamp = timestamp;
+		this.dockerInstance = dockerI;
+	}
+	
+	public Log() {}
+	
+	
+
+	public static boolean addLogs(List<JsonObject> obj, String appName) {
+		ArrayList <Log> l = new ArrayList<Log>();
+		for(JsonObject elem : obj) {
+			System.out.println(elem.get("date").toString());
+			l.add(new Log(
+					appName, 
+					String.valueOf(elem.get("message")),
+					OffsetDateTime.parse(elem.get("date").toString().replace('"',' ').trim())));
+		}
+		Log.persist(l.stream());
+		return true;
 	}
 
-	public static void addLogs(List<JsonObject> obj, String appName) {
-		Log l = new Log(appName,"test", "timestamp");
-		l.persist();
-//		obj.forEach(e -> e.entrySet().forEach(f -> createOne(f, appName)));
+	public static ArrayList<LogsApplication> getByTime(int timer) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        Instant instant = Instant.parse(df.format(new Date()));
+        OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        time = time.minusMinutes(timer);
+		return LogRessources.getByTime(time);		
 	}
-//	
-//	@Transactional
-//	private static void createOne(Entry<String, JsonValue> obj, String appName) {
-//		Log log = new Log(appName,"ok","dd");
-//		LogRessources.create(log);
-//	}
+
 }
