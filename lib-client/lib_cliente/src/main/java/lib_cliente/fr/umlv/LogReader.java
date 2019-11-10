@@ -9,8 +9,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.stream.Stream;
 import javax.json.bind.JsonbBuilder;
 
@@ -46,13 +54,16 @@ public class LogReader {
 		return res.replaceAll("[\r\n]+", "");
  	}
 
-	public void parse(String str, LocalDateTime time) {
+	public void parse(String str, OffsetDateTime time) {
 		array.add(new Log(time, str));
 	}
 
 	public void readStream(Stream<String> stream) {
-		System.out.println("okk");
-		LocalDateTime time = LocalDateTime.now();
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        Instant instant = Instant.parse(df.format(new Date()));
+        OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
 		stream.skip(read).forEach(e -> this.parse(e, time));
 		sendData();
 		read += Long.valueOf(array.size());
@@ -61,7 +72,6 @@ public class LogReader {
 	}
 
 		private void sendData() {
-			System.out.println(array.size());
 			if(array.size()==0)
 				return;
 			String obj = JsonbBuilder.create().toJson(this.array);
@@ -71,11 +81,8 @@ public class LogReader {
 					.setHeader("Content-Type", "application/json")
 					.POST(BodyPublishers.ofString(obj))
 					.build();
-	
-			HttpClient req = HttpClient.newHttpClient();
 			try {
-				HttpResponse a = req.send(requetePost, BodyHandlers.ofString());
-				System.out.println(a.statusCode());
+				HttpClient.newHttpClient().send(requetePost, BodyHandlers.ofString());
 			} catch (IOException | InterruptedException e) {
 				throw new UndeclaredThrowableException(e);
 			}

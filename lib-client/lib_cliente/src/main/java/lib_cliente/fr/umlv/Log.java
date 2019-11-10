@@ -1,17 +1,17 @@
 package lib_cliente.fr.umlv;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class Log {
-	private final LocalDateTime timestamp;
+	private final OffsetDateTime timestamp;
 	private final String message;
 	
-	public Log(LocalDateTime date, String mess) {
+	public Log(OffsetDateTime date, String mess) {
 		this.timestamp = date;
 		this.message = mess;
 	}
 	
-	public LocalDateTime getDate() {
+	public OffsetDateTime getDate() {
 		return timestamp;
 	}
 	

@@ -22,7 +22,6 @@ public class AppLifecycleBean {
 		
 		Thread mainT = new Thread(() -> {
 			while (true) {
-				System.out.println("test");
 				try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 					lr.readStream(stream);
 				} catch (IOException e) {
