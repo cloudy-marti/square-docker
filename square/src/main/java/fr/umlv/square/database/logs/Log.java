@@ -3,6 +3,7 @@ package fr.umlv.square.database.logs;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
+import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
@@ -45,24 +46,32 @@ public class Log extends PanacheEntity {
 	public static boolean addLogs(List<JsonObject> obj, String appName) {
 		ArrayList <Log> l = new ArrayList<Log>();
 		for(JsonObject elem : obj) {
-			System.out.println(elem.get("date").toString());
+			String message = String.valueOf(elem.get("message"));
+			message = message.substring(1, message.lastIndexOf(","));
 			l.add(new Log(
 					appName, 
-					String.valueOf(elem.get("message")),
+					message,
 					OffsetDateTime.parse(elem.get("date").toString().replace('"',' ').trim())));
 		}
 		Log.persist(l.stream());
 		return true;
 	}
-
-	public static ArrayList<LogsApplication> getByTime(int timer) {
+	
+	private static OffsetDateTime getTimed(int timer) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         df.setTimeZone(tz);
         Instant instant = Instant.parse(df.format(new Date()));
-        OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        time = time.minusMinutes(timer);
-		return LogRessources.getByTime(time);		
+        OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));	
+        return time.minusMinutes(timer);	
+	}
+
+	public static ArrayList<LogsApplication> getByTime(int timer, ApplicationsList appli) {
+		return LogRessources.getByTime(getTimed(timer), appli);		
+	}
+
+	public static List<LogsApplication> getByTimeAndFilter(int time, String filter, ApplicationsList listApp) {
+		return LogRessources.getByTimeAndFilter(getTimed(time), filter, listApp);	
 	}
 
 }

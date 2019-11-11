@@ -1,8 +1,8 @@
 package fr.umlv.square.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -17,39 +17,31 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import fr.umlv.square.database.logs.Log;
-import fr.umlv.square.models.Application;
+import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 
 @Path("/logs")
 public class LogsListRoute {
 
-	private List<LogsApplication> list = new ArrayList<LogsApplication>();
-	public LogsListRoute() {
-		Application a = new Application(201,"todomvc", 8082,15201,"todomvc-12");
-		Application b = new Application(202,"todomvc",8082,15202,"todomvc-13");
-		Application c = new Application(203,"todomvc",8082,15203,"todomvc-14");
-
-		list.add(new LogsApplication(a, "message de test", "2019-10-15T23:58:00.000Z"));
-		list.add(new LogsApplication(b, "message de test", "2019-11-15T23:58:00.000Z"));
-		list.add(new LogsApplication(c, "message de test", "2019-12-15T23:58:00.000Z"));
-	}
+	@Inject
+	ApplicationsList listApp;
+	
 
 	@Path("/{time}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public Response getTime(@PathParam("time") int time) {
-		System.out.println(time);
-		 
-		return Response.status(200).entity(LogsApplication.getListMapped(list)).build();
+		return Response.status(200).entity(LogsApplication.getListMapped(Log.getByTime(time, this.listApp))).build();
 	}
 	
 	@Path("/{time}/{filter}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") int id) {
-		System.out.println("time : " + time + " et id:" + id);
-		LogsApplication a = list.get(0);
-		return Response.status(200).entity(a.toMap()).build() ;
+	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") String filter) {
+		return Response.status(200).
+				entity(LogsApplication.getListMapped(Log.getByTimeAndFilter(time, filter, this.listApp))).
+				build();
 	}
 	
 	@Path("")
@@ -58,8 +50,9 @@ public class LogsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
     public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
-		 System.out.println("i received Logs from " + id + " !");
-		 Log.addLogs(obj, "monApp1");
-         return Response.status(Status.CREATED).entity(list.get(1)).build();
+		 boolean res = Log.addLogs(obj, "todomvc-12");
+         return res == true ? 
+        		Response.status(Status.CREATED).build() : 
+        		Response.status(Status.NOT_ACCEPTABLE).build();
     }
 }

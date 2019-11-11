@@ -3,9 +3,6 @@ package fr.umlv.square.models;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.json.Json;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
 import javax.json.bind.annotation.JsonbProperty;
 
 public class Application {

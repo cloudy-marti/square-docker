@@ -1,12 +1,10 @@
 package fr.umlv.square.controllers;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,9 +15,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import fr.umlv.square.docker.Docker;
-import fr.umlv.square.docker.DockerFileCompose;
+
 import fr.umlv.square.models.Application;
+import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.Stop;
 
 import static fr.umlv.square.docker.DockerDeploy.*;
@@ -27,25 +25,22 @@ import static fr.umlv.square.docker.DockerDeploy.*;
 
 @Path("/app")
 public class ApplicationsListRoute {
-	private static ArrayList<Application> list = new ArrayList<Application>();
 	
-	public ApplicationsListRoute() {
-		list.add(new Application(201,"todomvc",8082,15201,"todomvc-12"));
-		list.add(new Application(202,"todomvc",8082,15202,"todomvc-13"));
-		list.add(new Application(203,"todomvc",8082,15203,"todomvc-14"));
 
-	}
-	
+	@Inject
+	private ApplicationsList appList = new ApplicationsList();
+
+
 	@Path("/list")
 	@GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public ArrayList<Application>list() {
-        return list;
-    }
-	
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Application> list() {
+		return this.appList.getList();
+	}
+
 	@Path("/deploy")
-	@POST	
-    @Produces(MediaType.TEXT_PLAIN)
+	@POST
+	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
@@ -62,7 +57,7 @@ public class ApplicationsListRoute {
 
 			System.out.println("hello");
 			System.out.println(app.toMap());
-			list.add(app);
+			appList.add(app);
 
 			deployDocker(app);
 
@@ -81,24 +76,33 @@ public class ApplicationsListRoute {
 
 		return Response.status(Status.CREATED).build();
     }
-	
+//	
+//=======
+//	public Response deploy(JsonObject obj) {
+//		this.appList.add(new Application(201, "todomvc", 8082, 15201, "todomvc-12"));
+//		String str;
+//		String array[];
+//		try {
+//			str = obj.get("app").toString();	
+//			str = str.replace('"', ' ').trim();
+//			array = str.split(":");
+//			System.out.println(array[0]);
+//
+//			this.appList.add(new Application(204, array[0], Integer.parseInt(array[1]), 15204, "le nom"));
+//		} catch (NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
+//			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+//		}
+//		return Response.status(Status.CREATED).build();
+//	}
+
 	@Path("/stop")
-	@POST	
-    @Produces(MediaType.APPLICATION_JSON)
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
 		 System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
-		 Stop val = new Stop(list.get(1),"4m37s");
+		 Stop val = new Stop(appList.getList().get(1),"4m37s");
 		 
          return Response.status(Status.OK).entity(val.toMap()).build();
     }
-
-	public static Application getOneAppRunning(String dockerInstance) {
-		Optional<Application> op = list.stream().
-				filter(e -> dockerInstance.equals(e.getDockerInst())).
-				findFirst();
-		if(op.isEmpty())
-			return null;
-		return op.get();
-	}
 }

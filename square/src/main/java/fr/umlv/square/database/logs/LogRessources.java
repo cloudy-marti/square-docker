@@ -5,22 +5,27 @@ import java.util.ArrayList;
 
 import javax.transaction.Transactional;
 
-import fr.umlv.square.controllers.ApplicationsListRoute;
-import fr.umlv.square.controllers.LogsListRoute;
+import fr.umlv.square.models.Application;
+import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 class LogRessources {
 	@Transactional
-	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time){
+	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time, ApplicationsList appli){
 		String queryString = "timestamp > ?1";
-		System.out.println(time);
 		PanacheQuery<Log> query = Log.find(queryString,time);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
-			Application a = ApplicationsListRoute.getOneAppRunning(e.dockerInstance);
-			array.add(new LogsApplication(null, e.message,e.timestamp.toString()));
+			Application a = appli.getOneAppRunning(e.dockerInstance);
+			if(a != null)
+				array.add(new LogsApplication(a, e.message,e.timestamp.toString()));
 		});
 		return array;
+	}
+	
+	public static ArrayList<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
+		
+		return null;
 	}
 }
