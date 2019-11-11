@@ -15,9 +15,12 @@ public class Docker {
     private static final String stopCmdTemplate;
 
     static {
-            buildCmdTemplate = "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm ..";
-            runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
-            stopCmdTemplate = "docker container stop %s";
+        buildCmdTemplate = System.getProperty("user.dir").contains("target") ?
+                "cd ../.. | docker build -f docker-images/%s.jvm -t quarkus/%s-jvm ." :
+                "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm ." ;
+
+        runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
+        stopCmdTemplate = "docker container stop %s";
     }
 
     private final Application application;
@@ -52,7 +55,6 @@ public class Docker {
         return this.stopCmd;
     }
 
-    /*
     public String getBuildCmdToString() {
         StringJoiner strJoiner = new StringJoiner(" ");
         for(String str : buildCmd) {
@@ -76,8 +78,6 @@ public class Docker {
         }
         return strJoiner.toString();
     }
-
-     */
 
     public boolean isDockerRunning() {
         return this.running;

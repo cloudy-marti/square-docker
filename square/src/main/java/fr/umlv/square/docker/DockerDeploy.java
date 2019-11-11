@@ -25,6 +25,8 @@ public class DockerDeploy {
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
         processBuilder.redirectErrorStream(true);
         processBuilder.redirectOutput(Redirect.appendTo(dockerLog));
+
+        System.out.println(System.getProperty("user.dir"));
         processBuilder.start();
     }
 
@@ -42,14 +44,17 @@ public class DockerDeploy {
     public static void deployDocker(Application application) throws IOException {
         DockerFileCompose dockerFile = new DockerFileCompose(application);
         dockerFile.composeDockerFile();
+        System.out.println("Docker File Written !");
 
         Docker docker = new Docker(application);
 
         buildDockerImage(docker);
+        System.out.println("Docker Image Built !");
         runDockerImage(docker);
+        System.out.println("Docker Instance running !");
     }
 
-    public static void stopDockerImage(Docker docker) throws IOException {
+    public static void stopDockerInstance(Docker docker) throws IOException {
         createAndStartProcessBuilder(docker.getStopCmd());
 
         docker.stop();
@@ -82,6 +87,7 @@ public class DockerDeploy {
             apps.add(new Application(index, "appli_demo-runner", 8082, getUnboundedLocalPort(), "docker-" + index));
 
             System.out.println(apps.get(index).toMap().toString());
+            //System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
             try {
                 deployDocker(apps.get(index));
