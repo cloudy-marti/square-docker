@@ -15,9 +15,12 @@ public class Docker {
     private static final String stopCmdTemplate;
 
     static {
-            buildCmdTemplate = "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm .";
-            runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
-            stopCmdTemplate = "docker container stop %s";
+        buildCmdTemplate = System.getProperty("user.dir").contains("target") ?
+                "cd ../.. | docker build -f docker-images/%s.jvm -t quarkus/%s-jvm ." :
+                "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm ." ;
+
+        runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
+        stopCmdTemplate = "docker container stop %s";
     }
 
     private final Application application;
@@ -33,9 +36,9 @@ public class Docker {
 
         this.application = application;
 
-        this.buildCmd = String.format(buildCmdTemplate, this.application.getapp(), this.application.getapp()).split(" ");
-        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getapp()).split(" ");
-        this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" "); // TO DO
+        this.buildCmd = String.format(buildCmdTemplate, this.application.getappname(), this.application.getappname()).split(" ");
+        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getappname()).split(" ");
+        this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" ");
 
         this.running = false;
     }
@@ -50,6 +53,30 @@ public class Docker {
 
     public String[] getStopCmd() {
         return this.stopCmd;
+    }
+
+    public String getBuildCmdToString() {
+        StringJoiner strJoiner = new StringJoiner(" ");
+        for(String str : buildCmd) {
+            strJoiner.add(str);
+        }
+        return strJoiner.toString();
+    }
+
+    public String getRunCmdToString() {
+        StringJoiner strJoiner = new StringJoiner(" ");
+        for(String str : runCmd) {
+            strJoiner.add(str);
+        }
+        return strJoiner.toString();
+    }
+
+    public String getStopCmdToString() {
+        StringJoiner strJoiner = new StringJoiner(" ");
+        for(String str : stopCmd) {
+            strJoiner.add(str);
+        }
+        return strJoiner.toString();
     }
 
     public boolean isDockerRunning() {

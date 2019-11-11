@@ -27,6 +27,10 @@ public class Application {
 	public int getid() {
 		return id;
 	}
+
+	public String getappname() {
+		return this.app;
+	}
 	
 	public String getapp() {
 		return app+':'+port;

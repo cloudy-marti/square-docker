@@ -2,6 +2,7 @@ package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
@@ -21,19 +22,33 @@ public class DockerFileCompose {
      */
     static {
         dockerFileTemplate =
-                "FROM openjdk:11\n" +                       // base image
-                "EXPOSE %s\n" +                             // docker port exposed to host
-                "WORKDIR /workspace/\n" +                   // workspace directory
-                "COPY apps/%s /workspace/%s\n" +            // copy app into docker's workspace
-                "RUN [\"chmod\",\"+x\",\"%s\"]\n" +         // give exec permissions to .jar file
-                "CMD java -jar %s > log.log 2>&1";          // command to be executed when docker starts running
+                "FROM openjdk:11\n" +                                               // Base image giving openjdk 11 environment
+                "EXPOSE %s\n" +                                                     // Docker port exposed to host
+                "WORKDIR /workspace/\n" +                                           // Workspace directory
+
+                "COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar\n" +     // Copy files into docker's workspace
+                "COPY apps/%s.jar /workspace/%s.jar\n" +
+                "COPY docker-images/script.sh /workspace/script.sh\n" +
+
+                "RUN [\"chmod\",\"+x\",\"lib.jar\"]\n" +                            // Give permission to execute
+                "RUN [\"chmod\",\"+x\",\"%s.jar\"]\n" +
+                "RUN [\"chmod\",\"+x\",\"script.sh\"]\n" +
+
+                "RUN [\"sed\", \"-i\", \"s/\\r$//g\", \"script.sh\"]\n" +           // # Remove annoying '\r' Windows characters
+
+                "CMD [\"bash\", \"script.sh\", \"%s\"]";                            // Run script with bash - Name of demo-app given as a parameter
     }
 
     public DockerFileCompose(Application application) throws IOException {
         Objects.requireNonNull(application);
 
         this.application = application;
-        this.dockerFilePath = "../docker-images/" + this.application.getapp() + ".jvm";
+
+        this.dockerFilePath = System.getProperty("user.dir").contains("target") ?
+                "../../docker-images/" + this.application.getappname() + ".jvm" :
+                "../docker-images/" + this.application.getappname() + ".jvm";
+
+        System.out.println(System.getProperty("user.dir") + "\n" + dockerFilePath);
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
 
@@ -44,10 +59,11 @@ public class DockerFileCompose {
     private void composeDockerFileBuffer() {
         dockerFileBuffer = String.format(dockerFileTemplate,
                 application.getport(),
-                application.getapp(),
-                application.getapp(),
-                application.getapp(),
-                application.getapp());
+                application.getappname(),
+                application.getappname(),
+                application.getappname(),
+                application.getappname(),
+                application.getappname());
     }
 
     /**
