@@ -16,7 +16,7 @@ public class Docker {
 
     static {
         buildCmdTemplate = System.getProperty("user.dir").contains("target") ?
-                "cd ../.. | docker build -f docker-images/%s.jvm -t quarkus/%s-jvm ." :
+                "powershell.exe -c docker build -f ../../docker-images/%s.jvm -t quarkus/%s-jvm .." :
                 "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm ." ;
 
         runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";

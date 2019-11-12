@@ -57,6 +57,7 @@ public class ApplicationsListRoute {
 
 			System.out.println("hello");
 			System.out.println(app.toMap());
+
 			appList.add(app);
 
 			deployDocker(app);
@@ -70,30 +71,13 @@ public class ApplicationsListRoute {
 		} catch (IllegalStateException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Unbounded port not found").build();
 		} catch (IOException e) {
+			System.out.println(e.getCause());
 			e.printStackTrace();
 			return Response.status(Status.NOT_ACCEPTABLE).entity("IO Error").build();
 		}
 
 		return Response.status(Status.CREATED).build();
     }
-//	
-//=======
-//	public Response deploy(JsonObject obj) {
-//		this.appList.add(new Application(201, "todomvc", 8082, 15201, "todomvc-12"));
-//		String str;
-//		String array[];
-//		try {
-//			str = obj.get("app").toString();	
-//			str = str.replace('"', ' ').trim();
-//			array = str.split(":");
-//			System.out.println(array[0]);
-//
-//			this.appList.add(new Application(204, array[0], Integer.parseInt(array[1]), 15204, "le nom"));
-//		} catch (NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
-//			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
-//		}
-//		return Response.status(Status.CREATED).build();
-//	}
 
 	@Path("/stop")
 	@POST

@@ -1,16 +1,14 @@
 package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
-import org.hibernate.StaleStateException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
-import java.lang.ProcessBuilder.Redirect;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class DockerDeploy {
@@ -19,14 +17,25 @@ public class DockerDeploy {
      */
 
     private final static ArrayList<Docker> dockerInstances = new ArrayList<>();
-    private final static File dockerLog = new File("../logs/dockerLog");
+   //private final static File dockerLog = new File("../logs/dockerLog");
 
     private static void createAndStartProcessBuilder(String[] cmdLine) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
-        processBuilder.redirectErrorStream(true);
-        processBuilder.redirectOutput(Redirect.appendTo(dockerLog));
+        Objects.requireNonNull(cmdLine);
 
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
+        processBuilder.inheritIO();
+
+        /*processBuilder.redirectErrorStream(true);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(dockerLog));
+
+         */
+
+        /*
+        System.out.println(processBuilder.environment());
         System.out.println(System.getProperty("user.dir"));
+
+         */
+
         processBuilder.start();
     }
 
