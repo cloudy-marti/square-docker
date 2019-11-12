@@ -15,9 +15,11 @@ public class Docker {
     private static final String stopCmdTemplate;
 
     static {
-        buildCmdTemplate = System.getProperty("user.dir").contains("target") ?
-                "powershell.exe -c docker build -f ../../docker-images/%s.jvm -t quarkus/%s-jvm .." :
-                "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm ." ;
+        StringBuilder tmp = new StringBuilder(System.getProperty("os.name").equals("win") ?
+                "powershell.exe -c " : "bash /c ");
+        buildCmdTemplate = tmp.append(System.getProperty("user.dir").contains("target") ?
+                "docker build -f ../../docker-images/%s.jvm -t quarkus/%s-jvm .." :
+                "docker build -f ../docker-images/%s.jvm -t quarkus/%s-jvm .").toString();
 
         runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
         stopCmdTemplate = "docker container stop %s";
