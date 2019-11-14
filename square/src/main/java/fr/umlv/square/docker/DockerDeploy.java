@@ -43,8 +43,8 @@ public class DockerDeploy {
         return process;
     }
 
-    public static void deployDocker(Application application) throws IOException {
-        DockerFileCompose dockerFile = new DockerFileCompose(application);
+    public static void deployDocker(Application application, String port, String host) throws IOException {
+        DockerFileCompose dockerFile = new DockerFileCompose(application, port, host);
         dockerFile.composeDockerFile();
 
         Docker docker = new Docker(application);
@@ -55,8 +55,6 @@ public class DockerDeploy {
         } catch (InterruptedException e) {
             throw new UndeclaredThrowableException(e);
         }
-        System.out.println("build is done " + buildProcess.exitValue());
-
         runDockerImage(docker);
     }
 
@@ -82,23 +80,5 @@ public class DockerDeploy {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public static void main (String[] args) {
-
-        ArrayList<Application> apps = new ArrayList<>();
-
-        IntStream.range(0, 5).forEach(index -> {
-
-            apps.add(new Application(index, "appli_demo-runner", 8082, getUnboundedLocalPort(), "docker-" + index));
-
-            System.out.println(apps.get(index).toMap().toString());
-
-            try {
-                deployDocker(apps.get(index));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
     }
 }

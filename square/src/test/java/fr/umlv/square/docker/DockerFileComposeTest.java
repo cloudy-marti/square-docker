@@ -17,14 +17,14 @@ public class DockerFileComposeTest {
 
     @Test
     void dockerFileComposeWithNullAppShouldThrowNullPointerException () {
-        assertThrows(NullPointerException.class, () -> new DockerFileCompose(null));
+        assertThrows(NullPointerException.class, () -> new DockerFileCompose(null, "", ""));
     }
 
     @Test
     void assertDockerFileComposeGetsTheRightPath() throws IOException {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
+        DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost");
         String tmp = "../docker-images/" + application.getappname() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
@@ -34,7 +34,7 @@ public class DockerFileComposeTest {
     void assertDockerFileComposeCreatesADockerFile () throws IOException {
         Application application = new Application(1, "hello",8080, 8080, "docker");
 
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
+        DockerFileCompose dockerFileCompose = new DockerFileCompose(application,"8080", "localhost");
         dockerFileCompose.composeDockerFile();
 
         Path path = Paths.get(dockerFileCompose.getDockerFilePath());
@@ -46,7 +46,7 @@ public class DockerFileComposeTest {
     void assertDockerFileComposeWritesTheRightDockerFile () throws IOException {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application);
+        DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost");
         dockerFileCompose.composeDockerFile();
 
         String tmp =    "FROM openjdk:11\n" +

@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import fr.umlv.square.models.Application;
 import fr.umlv.square.models.ApplicationsList;
@@ -29,8 +30,11 @@ public class ApplicationsListRoute {
 
 	@Inject
 	private ApplicationsList appList = new ApplicationsList();
-
-
+	@ConfigProperty(name = "quarkus.http.port")
+	private String port;
+	@ConfigProperty(name = "quarkus.http.host")
+	private String host;
+	
 	@Path("/list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -55,12 +59,9 @@ public class ApplicationsListRoute {
 
 			Application app = new Application(205,array[0],Integer.parseInt(array[1]), getUnboundedLocalPort(),"docker-"+205);
 
-			System.out.println("hello");
-			System.out.println(app.toMap());
-
 			this.appList.add(app);
 
-			deployDocker(app);
+			deployDocker(app, port, host);
 
 		} catch(NullPointerException  e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
