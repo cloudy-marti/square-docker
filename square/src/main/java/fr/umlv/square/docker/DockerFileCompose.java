@@ -35,8 +35,10 @@ public class DockerFileCompose {
                 "RUN [\"chmod\",\"+x\",\"script.sh\"]\n" +
 
                 "RUN [\"sed\", \"-i\", \"s/\\r$//g\", \"script.sh\"]\n" +           // # Remove annoying '\r' Windows characters
+                "CMD [\"bash\", \"script.sh\", \"%s\"]\n" +                         // Run script with bash - Name of demo-app given as a parameter
 
-                "CMD [\"bash\", \"script.sh\", \"%s\"]";                            // Run script with bash - Name of demo-app given as a parameter
+                "HEALTHCHECK --interval=5s --timeout=3s --retries=3 \\" +           // Check app's health
+                "\nCMD curl -f http://localhost:8080 || exit 1";
     }
 
     public DockerFileCompose(Application application) throws IOException {

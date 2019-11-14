@@ -4,11 +4,13 @@ import fr.umlv.square.models.Application;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class DockerDeploy {
@@ -18,25 +20,27 @@ public class DockerDeploy {
 
     private final static ArrayList<Docker> dockerInstances = new ArrayList<>();
 
-    private static void createAndStartProcessBuilder(String[] cmdLine) throws IOException {
+    private static Process createAndStartProcessBuilder(String[] cmdLine) throws IOException {
         Objects.requireNonNull(cmdLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
         processBuilder.directory(new File("../.."));
         processBuilder.inheritIO();
 
-        processBuilder.start();
+        return processBuilder.start();
     }
 
-    private static void buildDockerImage(Docker docker) throws IOException {
-        createAndStartProcessBuilder(docker.getBuildCmd());
+    private static Process buildDockerImage(Docker docker) throws IOException {
+        return createAndStartProcessBuilder(docker.getBuildCmd());
     }
 
-    private static void runDockerImage(Docker docker) throws IOException {
-        createAndStartProcessBuilder(docker.getRunCmd());
+    private static Process runDockerImage(Docker docker) throws IOException {
+        Process process = createAndStartProcessBuilder(docker.getRunCmd());
 
         docker.run();
         addToDockerListing(docker);
+
+        return process;
     }
 
     public static void deployDocker(Application application) throws IOException {
@@ -45,9 +49,14 @@ public class DockerDeploy {
 
         Docker docker = new Docker(application);
 
-        System.out.println(System.getProperty("os.name"));
+        Process buildProcess = buildDockerImage(docker);
+        try {
+            buildProcess.waitFor();
+        } catch (InterruptedException e) {
+            throw new UndeclaredThrowableException(e);
+        }
+        System.out.println("build is done " + buildProcess.exitValue());
 
-        buildDockerImage(docker);
         runDockerImage(docker);
     }
 
