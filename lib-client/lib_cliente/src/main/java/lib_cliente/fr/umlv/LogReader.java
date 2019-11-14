@@ -31,8 +31,8 @@ public class LogReader {
 	
 
 	public LogReader() {
-		localIP = "192.168.1.67";
-		portSquare = 8080;
+		localIP = System.getenv("SQUARE_HOST");
+		portSquare = Integer.parseInt(System.getenv("SQUARE_PORT"));
 		id = setId();
 		this.array = new ArrayList<Log>();
 	}

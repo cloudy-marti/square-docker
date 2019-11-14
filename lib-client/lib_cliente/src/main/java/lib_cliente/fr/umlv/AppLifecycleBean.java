@@ -17,7 +17,7 @@ import io.quarkus.runtime.StartupEvent;
 public class AppLifecycleBean {
 	void onStart(@Observes StartupEvent ev) {
 		LogReader lr = new LogReader();
-		String fileName = "workspace/log.log";
+		String fileName = "log.log";
 		
 		
 		Thread mainT = new Thread(() -> {
