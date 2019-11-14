@@ -22,6 +22,7 @@ public class DockerDeploy {
         Objects.requireNonNull(cmdLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
+        processBuilder.directory(new File("../.."));
         processBuilder.inheritIO();
 
         processBuilder.start();
@@ -43,6 +44,8 @@ public class DockerDeploy {
         dockerFile.composeDockerFile();
 
         Docker docker = new Docker(application);
+
+        System.out.println(System.getProperty("os.name"));
 
         buildDockerImage(docker);
         runDockerImage(docker);

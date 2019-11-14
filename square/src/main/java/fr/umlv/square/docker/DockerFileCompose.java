@@ -44,9 +44,7 @@ public class DockerFileCompose {
 
         this.application = application;
 
-        this.dockerFilePath = System.getProperty("user.dir").contains("target") ?
-                "../../docker-images/" + this.application.getappname() + ".jvm" :
-                "../docker-images/" + this.application.getappname() + ".jvm";
+        this.dockerFilePath = "../../docker-images/" + this.application.getappname() + ".jvm";
 
         System.out.println(System.getProperty("user.dir") + "\n" + dockerFilePath);
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
