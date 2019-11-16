@@ -153,3 +153,4 @@ bin/
 .project
 
 
+square/src/main/resources/application.properties

@@ -1,4 +1,4 @@
-package fr.umlv.sqaure.lifeBean;
+package fr.umlv.square.lifeBean;
 
 import java.io.IOException;
 import java.io.InputStream;

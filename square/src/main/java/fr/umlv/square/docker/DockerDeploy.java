@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import java.util.concurrent.TimeUnit;
@@ -70,13 +71,19 @@ public class DockerDeploy {
         Objects.requireNonNull(dockerInstance);
         Process stopProcess = createAndStartProcessBuilder(String.format("docker container stop %s", dockerInstance).split(" "));
 
+        try {
+            stopProcess.waitFor();
+        } catch (InterruptedException e) {
+            throw new UndeclaredThrowableException(e);
+        }
+
         return stopProcess.exitValue() == 0;
     }
 
     public static List<String> getRunningInstancesNames() throws IOException {
 
         ProcessBuilder dockerPs = new ProcessBuilder(("docker ps --format '{{.Names}}'").split(" "));
-        String output = IOUtils.toString(dockerPs.start().getInputStream(), "UTF-8");
+        String output = IOUtils.toString(dockerPs.start().getInputStream(), StandardCharsets.UTF_8);
 
         return Arrays.asList(output.replace("'", "").split("\n"));
     }

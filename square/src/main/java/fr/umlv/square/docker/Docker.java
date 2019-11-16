@@ -7,9 +7,6 @@ import java.util.StringJoiner;
 
 public class Docker {
 
-    /**
-     * Object to be created when a docker process is deployed, to be saved
-     */
     private static final String buildCmdTemplate;
     private static final String runCmdTemplate;
 
@@ -17,7 +14,6 @@ public class Docker {
         StringBuilder tmp = new StringBuilder(System.getProperty("os.name").toLowerCase().startsWith("win") ?
                 "powershell.exe -c " : "env -- ");
         buildCmdTemplate = tmp.append("docker build -f docker-images/%s.jvm -t quarkus/%s-jvm .").toString();
-
         runCmdTemplate = "docker run -d -it --rm --name %s -p %s:%s quarkus/%s-jvm";
     }
 

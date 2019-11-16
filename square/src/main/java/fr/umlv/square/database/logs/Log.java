@@ -40,8 +40,6 @@ public class Log extends PanacheEntity {
 	}
 	
 	public Log() {}
-	
-	
 
 	public static boolean addLogs(List<JsonObject> obj, String appName) {
 		ArrayList <Log> l = new ArrayList<Log>();

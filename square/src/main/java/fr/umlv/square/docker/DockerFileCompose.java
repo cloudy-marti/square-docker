@@ -17,10 +17,7 @@ public class DockerFileCompose {
     private String dockerFileBuffer;
     private String port;
     private String host;
-	
-    /**
-     * Make template once with the first instantiation / static method call
-     */
+
     static {
         dockerFileTemplate =
                 "FROM openjdk:11\n" +                                               // Base image giving openjdk 11 environment
@@ -72,10 +69,6 @@ public class DockerFileCompose {
                 application.getAppname());
     }
 
-    /**
-     * Write dockerfile buffer in a file
-     * @throws IOException
-     */
     public void composeDockerFile() throws IOException {
         composeDockerFileBuffer();
         dockerFileBufferedWriter.write(dockerFileBuffer);

@@ -2,10 +2,6 @@
 !target/*-runner
 !target/*-runner.jar
 !target/lib/*
-<<<<<<< Updated upstream
-=======
-!apps/*-runner.jar
->>>>>>> Stashed changes
 !apps/*.jar
 !target/*-runner.jar
 !logs/*.log

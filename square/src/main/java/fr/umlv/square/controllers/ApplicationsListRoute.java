@@ -1,10 +1,7 @@
 package fr.umlv.square.controllers;
 import java.io.IOException;
 
-import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
@@ -80,7 +77,7 @@ public class ApplicationsListRoute {
 			getRunningInstancesNames();
 			dockerInstances.put(app.getId(), app.getDockerInst());
 
-			System.out.println(dockerInstances.toString());
+			//System.out.println(dockerInstances.toString());
 
 		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
@@ -104,10 +101,20 @@ public class ApplicationsListRoute {
 		try {
 			String[] array = getFromJson(obj, "id");
 
-			if(!stopDockerInstance(dockerInstances.remove(Integer.parseInt(array[0])))) {
+			int id = Integer.parseInt(array[0]);
+			Optional<String> dockerInstanceName = getRunningInstancesNames().stream()
+					.filter(instance -> instance.endsWith("-" + id))
+					.findFirst();
+
+			if(dockerInstanceName.isEmpty()) {
+				return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer running").build();
+			}
+
+			if(!stopDockerInstance(dockerInstanceName.get())) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 			System.out.println("Running containers after stop = " + dockerInstances.toString());
+			dockerInstances.remove(id);
 
 		} catch (NullPointerException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
