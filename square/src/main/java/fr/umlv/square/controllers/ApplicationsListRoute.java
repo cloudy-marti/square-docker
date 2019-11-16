@@ -3,7 +3,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
@@ -35,10 +37,9 @@ public class ApplicationsListRoute {
 	@ConfigProperty(name = "quarkus.http.port")
 	private String port;
 	@ConfigProperty(name = "quarkus.http.host")
-	private String host;
-	@ConfigProperty(name = "square.available.apps")
-	private String appAvailable;
-	
+	private String host;	
+	private int idApps;
+
 	@Path("/list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -56,33 +57,35 @@ public class ApplicationsListRoute {
 		String str;
 		String array[];
 		Application app;
-		var listApp = this.appAvailable.split(","); 
+		
 
 		try {
 			str = obj.get("app").toString();
 			str = str.replace('"',' ').trim();
 			array = str.split(":");
 			
-			if(!Arrays.asList(listApp).contains(array[0]))
+			if(!this.appList.appAvailable().contains(array[0]))
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
-			app = new Application(205,array[0],Integer.parseInt(array[1]), getUnboundedLocalPort(),array[0]+"-"+205);
+			app = new Application(
+					this.idApps,array[0],
+					Integer.parseInt(array[1]),
+					getUnboundedLocalPort(),
+					array[0]+"-"+ (this.appList.getDeployID(array[0])));
+
+			if(!deployDocker(app, this.port, this.host))
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
 			this.appList.add(app);
+			this.appList.increment_app(array[0]);
+			this.idApps++;
 
-			deployDocker(app, port, host);
-
-		} catch(NullPointerException  e) {
+		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
-		} catch (IndexOutOfBoundsException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("index out of bound").build();
-		} catch (NumberFormatException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("number format exception").build();
-		} catch (IllegalStateException e) {
+		}catch (IllegalStateException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Unbounded port not found").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
-
 		return Response.status(Status.CREATED).entity(app).build();
     }
 
