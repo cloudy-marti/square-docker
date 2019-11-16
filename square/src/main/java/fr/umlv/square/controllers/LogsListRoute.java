@@ -50,9 +50,11 @@ public class LogsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
     public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
-		 boolean res = Log.addLogs(obj, "todomvc-12");
-         return res == true ? 
-        		Response.status(Status.CREATED).build() : 
-        		Response.status(Status.NOT_ACCEPTABLE).build();
+		return Response.status(Status.CREATED).build();
+//		 var app = this.listApp.getOneAppRunning("");  
+//		 boolean res = Log.addLogs(obj, app);
+//        return res ? 
+//       		Response.status(Status.CREATED).build() : 
+//       		Response.status(Status.NOT_ACCEPTABLE).build();
     }
 }

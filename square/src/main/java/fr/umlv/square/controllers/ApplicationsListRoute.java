@@ -78,7 +78,7 @@ public class ApplicationsListRoute {
 			this.idApps++;
 
 			getRunningInstancesNames();
-			dockerInstances.put(app.getid(), app.getDockerInst());
+			dockerInstances.put(app.getId(), app.getDockerInst());
 
 			System.out.println(dockerInstances.toString());
 

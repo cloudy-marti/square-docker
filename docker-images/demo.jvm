@@ -1,0 +1,15 @@
+FROM openjdk:11
+EXPOSE 8080
+WORKDIR /workspace/
+ENV SQUARE_PORT=8080
+ENV SQUARE_HOST=192.168.1.67
+COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar
+COPY apps/demo.jar /workspace/demo.jar
+COPY docker-images/script.sh /workspace/script.sh
+RUN ["chmod","+x","lib.jar"]
+RUN ["chmod","+x","demo.jar"]
+RUN ["chmod","+x","script.sh"]
+RUN ["sed", "-i", "s/\r$//g", "script.sh"]
+CMD ["bash", "script.sh", "demo"]
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
+CMD curl -f http://localhost:8080 || exit 1

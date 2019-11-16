@@ -3,7 +3,12 @@ package fr.umlv.square.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
+
+import fr.umlv.square.serializer.ApplicationSerializer;
 
 public class Application {
 	private final int id;
@@ -21,24 +26,24 @@ public class Application {
 		this.docker_instance = dock_instance;
 	}
 	
-	public int getid() {
+	public int getId() {
 		return id;
 	}
 
-	public String getappname() {
+	public String getAppname() {
 		return this.app;
 	}
 	
-	public String getapp() {
+	public String getApp() {
 		return app+':'+port;
 	}
 
-	public int getport() {
+	public int getPort() {
 		return port;
 	}
 	
 	@JsonbProperty("service-port")
-	public int getserviceport() {
+	public int getServicePort() {
 		return service_port;
 	}
 	
@@ -52,11 +57,18 @@ public class Application {
 	public Map<String, Object> toMap(){
 		Map<String,Object> map = new HashMap<String, Object>();
 		map.put("id", id);
-		map.put("app", getapp());
+		map.put("app", getApp());
 		map.put("port", port);
 		map.put("service-port", service_port);
 		map.put("docker-instance", docker_instance);
 		
 		return map;
+	}
+	
+	public static String serialize(Application app) {
+		JsonbConfig config = new JsonbConfig()
+		        .withSerializers(new ApplicationSerializer());
+		Jsonb jsonb = JsonbBuilder.create(config);
+		return jsonb.toJson(app);
 	}
 }

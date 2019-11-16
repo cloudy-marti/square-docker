@@ -25,7 +25,7 @@ public class DockerFileComposeTest {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost");
-        String tmp = "../docker-images/" + application.getappname() + ".jvm";
+        String tmp = "../docker-images/" + application.getAppname() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
     }

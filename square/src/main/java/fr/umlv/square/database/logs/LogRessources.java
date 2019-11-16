@@ -2,6 +2,7 @@ package fr.umlv.square.database.logs;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -14,7 +15,30 @@ class LogRessources {
 	@Transactional
 	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time, ApplicationsList appli){
 		String queryString = "timestamp > ?1";
-		PanacheQuery<Log> query = Log.find(queryString,time);
+		return getData(queryString, appli, time);
+	}
+	
+	public static ArrayList<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
+		int value;
+		String queryString;
+		if((value = isNumeric(filter)) > -1) {
+			queryString = "idApp = ?1";
+			return getData(queryString, appli, value);
+		}
+		else if(isName(filter)) {
+			queryString = "appName = ?1";
+			return getData(queryString, appli, filter);
+		}
+		else if(isInstance(filter)) {
+			queryString = "dockerInstance = ?1";
+			return getData(queryString, appli, filter);			
+		}
+		else
+			throw new IllegalArgumentException();
+	}
+	
+	private static ArrayList<LogsApplication> getData(String queryString, ApplicationsList appli, Object... params){
+		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
 			Application a = appli.getOneAppRunning(e.dockerInstance);
@@ -24,8 +48,28 @@ class LogRessources {
 		return array;
 	}
 	
-	public static ArrayList<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
-		
-		return null;
+	
+	private static boolean isName(String filter) {
+		var array = filter.split(":");
+		if(array.length != 2 || isNumeric(array[1])<=-1)
+			return false;
+		return true;
+	}
+	
+	private static boolean isInstance(String filter) {
+		var array = filter.split("-");
+		if(array.length != 2 || isNumeric(array[1])<=-1)
+			return false;
+		return true;
+	}
+	
+	private static int isNumeric(String filter) {
+		try {
+			var value = Integer.parseInt(filter);
+			return value;
+		}
+		catch(NumberFormatException e) {
+			return -1;
+		}
 	}
 }
