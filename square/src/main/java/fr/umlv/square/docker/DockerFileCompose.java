@@ -54,7 +54,7 @@ public class DockerFileCompose {
         this.application = application;
         this.port = port;
         this.host = host;
-        this.dockerFilePath = "../../docker-images/" + this.application.getappname() + ".jvm";
+        this.dockerFilePath = "../../docker-images/" + this.application.getAppname() + ".jvm";
 
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
@@ -65,14 +65,14 @@ public class DockerFileCompose {
 
     private void composeDockerFileBuffer() {
         this.dockerFileBuffer = String.format(dockerFileTemplate,
-                application.getport(),
+                application.getPort(),
                 this.port,
                 this.host,
-                application.getappname(),
-                application.getappname(),
-                application.getappname(),
-                application.getappname(),
-                application.getappname());
+                application.getAppname(),
+                application.getAppname(),
+                application.getAppname(),
+                application.getAppname(),
+                application.getAppname());
     }
 
     /**

@@ -43,8 +43,11 @@ public class ApplicationsListRoute {
 	@Path("/list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public ArrayList<Application> list() {
-		return this.appList.getList();
+	public String list() {
+		StringBuilder str = new StringBuilder();
+		for(var elem : this.appList.getList())
+			str.append(Application.serialize(elem));
+		return str.toString();
 	}
 
 	@Path("/deploy")
@@ -86,7 +89,7 @@ public class ApplicationsListRoute {
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
-		return Response.status(Status.CREATED).entity(app).build();
+		return Response.status(Status.CREATED).entity(Application.serialize(app)).build();
     }
 
 	@Path("/stop")

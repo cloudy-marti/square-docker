@@ -36,8 +36,8 @@ public class Docker {
 
         this.application = application;
 
-        this.buildCmd = String.format(buildCmdTemplate, this.application.getappname(), this.application.getappname()).split(" ");
-        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getappname()).split(" ");
+        this.buildCmd = String.format(buildCmdTemplate, this.application.getAppname(), this.application.getAppname()).split(" ");
+        this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getServicePort(), this.application.getPort(), this.application.getAppname()).split(" ");
         this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" ");
 
         this.running = false;
