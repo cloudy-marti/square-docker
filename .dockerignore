@@ -2,7 +2,7 @@
 !target/*-runner
 !target/*-runner.jar
 !target/lib/*
-!apps/*-runner.jar
+!apps/*.jar
 !target/*-runner.jar
 !logs/*.log
 !lib-client/*.jar
