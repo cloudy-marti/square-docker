@@ -1,49 +1,53 @@
 package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
+import org.apache.commons.io.IOUtils;
 
+import javax.inject.Inject;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.ArrayList;
+import java.util.*;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class DockerDeploy {
-    /**
-     * Static Methods with ProcessBuilder
-     */
 
-    private final static ArrayList<Docker> dockerInstances = new ArrayList<>();
+    @Inject
+    private HashMap<String, String> appImage = new HashMap<>();
 
     private static Process createAndStartProcessBuilder(String[] cmdLine) throws IOException {
         Objects.requireNonNull(cmdLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
+        //System.out.println(new File("../..").getCanonicalPath());
         processBuilder.directory(new File("../.."));
-        processBuilder.inheritIO();
 
         return processBuilder.start();
     }
 
     private static Process buildDockerImage(Docker docker) throws IOException {
+        Objects.requireNonNull(docker);
         return createAndStartProcessBuilder(docker.getBuildCmd());
     }
 
     private static Process runDockerImage(Docker docker) throws IOException {
+        Objects.requireNonNull(docker);
         Process process = createAndStartProcessBuilder(docker.getRunCmd());
-
-        docker.run();
-        addToDockerListing(docker);
 
         return process;
     }
 
     public static boolean deployDocker(Application application, String port, String host) throws IOException {
+        Objects.requireNonNull(application);
+        Objects.requireNonNull(port);
+        Objects.requireNonNull(host);
+
         DockerFileCompose dockerFile = new DockerFileCompose(application, port, host);
         dockerFile.composeDockerFile();
 
@@ -62,19 +66,19 @@ public class DockerDeploy {
         return buildProcess.exitValue() == 0 && runProcess.exitValue() == 0;
     }
 
-    public static void stopDockerInstance(Docker docker) throws IOException {
-        createAndStartProcessBuilder(docker.getStopCmd());
+    public static boolean stopDockerInstance(String dockerInstance) throws IOException {
+        Objects.requireNonNull(dockerInstance);
+        Process stopProcess = createAndStartProcessBuilder(String.format("docker container stop %s", dockerInstance).split(" "));
 
-        docker.stop();
-        removeDockerFromListing(docker);
+        return stopProcess.exitValue() == 0;
     }
 
-    private static void addToDockerListing(Docker docker) {
-        dockerInstances.add(docker);
-    }
+    public static List<String> getRunningInstancesNames() throws IOException {
 
-    private static void removeDockerFromListing(Docker docker) {
-        dockerInstances.remove(docker);
+        ProcessBuilder dockerPs = new ProcessBuilder(("docker ps --format '{{.Names}}'").split(" "));
+        String output = IOUtils.toString(dockerPs.start().getInputStream(), "UTF-8");
+
+        return Arrays.asList(output.replace("'", "").split("\n"));
     }
 
     public static int getUnboundedLocalPort() {
