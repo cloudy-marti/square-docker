@@ -54,7 +54,6 @@ public class ApplicationsListRoute {
 
 	@Path("/deploy")
 	@POST
-	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
@@ -66,12 +65,15 @@ public class ApplicationsListRoute {
 			if(!this.appList.appAvailable().contains(array[0]))
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 
+			
 			app = new Application(
 					this.idApps,
-					array[0].concat(":").concat(array[1]),
+					array[0],
 					Integer.parseInt(array[1]),
 					getUnboundedLocalPort(),
 					array[0]+"-"+ (this.appList.getDeployID(array[0])));
+
+			System.out.println(app.getAppname());
 
 			if(!deployDocker(app, this.port, this.host))
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
