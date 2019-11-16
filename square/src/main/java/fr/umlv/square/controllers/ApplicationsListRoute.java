@@ -1,11 +1,6 @@
 package fr.umlv.square.controllers;
 import java.io.IOException;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 import javax.inject.Inject;
@@ -54,6 +49,7 @@ public class ApplicationsListRoute {
 
 	@Path("/deploy")
 	@POST
+	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
@@ -64,7 +60,6 @@ public class ApplicationsListRoute {
 			
 			if(!this.appList.appAvailable().contains(array[0]))
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
-
 			
 			app = new Application(
 					this.idApps,
@@ -97,7 +92,7 @@ public class ApplicationsListRoute {
 
 	@Path("/stop")
 	@POST
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
