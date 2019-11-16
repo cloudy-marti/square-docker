@@ -21,18 +21,18 @@ class LogRessources {
 	public static ArrayList<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
 		int value;
 		String queryString;
-		String queryString2 = "AND timestamp > ?2";
+		String queryString2 = "and timestamp > ?2";
 		if((value = isNumeric(filter)) > -1) {
-			queryString = "idApp = ?1 " + queryString2;
-			return getData(queryString, appli, value);
+			queryString = "idapp = ?1 ".concat(queryString2);
+			return getData(queryString, appli, value, time);
 		}
 		else if(isName(filter)) {
-			queryString = "appName = ?1 " + queryString2;
-			return getData(queryString, appli, filter);
+			queryString = "appname = ?1 ".concat(queryString2);
+			return getData(queryString, appli, filter, time);
 		}
-		else if(isInstance(filter)) {
-			queryString = "dockerInstance = ?1 " + queryString2;
-			return getData(queryString, appli, filter);			
+		else if(isInstance(filter)) {	
+			queryString = "dockerinstance = ?1 ".concat(queryString2);
+			return getData(queryString, appli, filter, time);			
 		}
 		else
 			throw new IllegalArgumentException();

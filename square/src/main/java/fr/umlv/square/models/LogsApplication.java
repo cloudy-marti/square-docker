@@ -5,6 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.annotation.JsonbTransient;
+
+import fr.umlv.square.serializer.ApplicationSerializer;
+import fr.umlv.square.serializer.LogsApplicationSerializer;
+
 
 public class LogsApplication {
 	private final Application app;
@@ -21,17 +29,32 @@ public class LogsApplication {
 		this.timestamp = tS;
 	}
 	
-	public static List<Map<String, Object>> getListMapped(List<LogsApplication>list){
-		List<Map<String, Object>> list_parsed = new ArrayList<Map<String, Object>>();
-		for(LogsApplication log : list) 
-			list_parsed.add(log.toMap());
-		return list_parsed;
+	public static String listToJson(List<LogsApplication>list){
+		StringBuilder str = new StringBuilder();
+		for(var elem : list)
+			str.append(LogsApplication.serialize(elem));
+		return str.toString();
 
 	}
-	public Map<String, Object> toMap(){
-		Map<String, Object> m = this.app.toMap();
-		m.put("message", message);
-		m.put("timestamp", timestamp);
-		return m;
+	private static String serialize(LogsApplication app) {
+		JsonbConfig config = new JsonbConfig()
+		        .withSerializers(new LogsApplicationSerializer());
+		Jsonb jsonb = JsonbBuilder.create(config);
+		return jsonb.toJson(app);
+	}
+
+	@JsonbTransient
+	public Application getApplication() {
+		return this.app;
+	}
+	
+	@JsonbTransient
+	public String getMessage() {
+		return this.message;
+	}
+	
+	@JsonbTransient
+	public String getTimestamp() {
+		return this.timestamp;
 	}
 }

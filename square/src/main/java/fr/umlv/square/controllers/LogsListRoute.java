@@ -32,7 +32,7 @@ public class LogsListRoute {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response getTime(@PathParam("time") int time) {
-		return Response.status(200).entity(LogsApplication.getListMapped(Log.getByTime(time, this.listApp))).build();
+		return Response.status(200).entity(LogsApplication.listToJson(Log.getByTime(time, this.listApp))).build();
 	}
 	
 	@Path("/{time}/{filter}")
@@ -40,7 +40,7 @@ public class LogsListRoute {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") String filter) {
 		return Response.status(200).
-				entity(LogsApplication.getListMapped(Log.getByTimeAndFilter(time, filter, this.listApp))).
+				entity(LogsApplication.listToJson(Log.getByTimeAndFilter(time, filter, this.listApp))).
 				build();
 	}
 	
@@ -50,11 +50,10 @@ public class LogsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
     public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
-		return Response.status(Status.CREATED).build();
-//		 var app = this.listApp.getOneAppRunning("");  
-//		 boolean res = Log.addLogs(obj, app);
-//        return res ? 
-//       		Response.status(Status.CREATED).build() : 
-//       		Response.status(Status.NOT_ACCEPTABLE).build();
+		 var app = this.listApp.getOneAppRunning("demo-0");  
+		 boolean res = Log.addLogs(obj, app);
+        return res ? 
+       		Response.status(Status.CREATED).build() : 
+       		Response.status(Status.NOT_ACCEPTABLE).build();
     }
 }
