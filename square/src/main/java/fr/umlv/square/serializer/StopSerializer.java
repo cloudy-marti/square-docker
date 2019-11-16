@@ -1,21 +1,29 @@
 package fr.umlv.square.serializer;
 
+import fr.umlv.square.models.Application;
 import fr.umlv.square.models.Stop;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.util.Objects;
 
 public class StopSerializer implements JsonbSerializer<Stop> {
     @Override
     public void serialize(Stop obj, JsonGenerator generator, SerializationContext ctx) {
+        Objects.requireNonNull(obj);
+        Objects.requireNonNull(generator);
+        Objects.requireNonNull(ctx);
+
+        Application tmp = obj.getApp();
+
         generator.writeStartObject();
-        generator.write("id", obj.getApp().getId());
-        generator.write("app", obj.getApp().getApp());
-        generator.write("port", obj.getApp().getPort());
-        generator.write("service-port", obj.getApp().getServicePort());
-        generator.write("docker-instance", obj.getApp().getDockerInst());
-        generator.write("elapsed_time", obj.getApp().getElapsedTime());
+        generator.write("id", tmp.getId());
+        generator.write("app", tmp.getApp());
+        generator.write("port", tmp.getPort());
+        generator.write("service-port", tmp.getServicePort());
+        generator.write("docker-instance", tmp.getDockerInst());
+        generator.write("elapsed_time", tmp.getElapsedTime());
         generator.writeEnd();
     }
 }
