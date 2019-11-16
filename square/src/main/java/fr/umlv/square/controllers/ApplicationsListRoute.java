@@ -67,7 +67,8 @@ public class ApplicationsListRoute {
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 
 			app = new Application(
-					this.idApps,array[0],
+					this.idApps,
+					array[0].concat(":").concat(array[1]),
 					Integer.parseInt(array[1]),
 					getUnboundedLocalPort(),
 					array[0]+"-"+ (this.appList.getDeployID(array[0])));
@@ -101,8 +102,6 @@ public class ApplicationsListRoute {
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
 
-		//System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
-		// Stop val = new Stop(appList.getList().get(1),"4m37s");
 		try {
 			String[] array = getFromJson(obj, "id");
 			int id = Integer.parseInt(array[0]);

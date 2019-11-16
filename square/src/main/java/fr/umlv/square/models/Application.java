@@ -78,4 +78,4 @@ public class Application {
 		Jsonb jsonb = JsonbBuilder.create(config);
 		return jsonb.toJson(app);
 	}
-}
+}	

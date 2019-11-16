@@ -1,6 +1,6 @@
-package fr.umlv.square.serializer;
+	package fr.umlv.square.serializer;
 
-import javax.json.bind.serializer.JsonbSerializer;
+	import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
