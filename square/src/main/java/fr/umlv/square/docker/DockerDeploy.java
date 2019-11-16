@@ -52,10 +52,10 @@ public class DockerDeploy {
         Process buildProcess = buildDockerImage(docker);
         try {
             buildProcess.waitFor();
+            runDockerImage(docker).waitFor();
         } catch (InterruptedException e) {
             throw new UndeclaredThrowableException(e);
         }
-        runDockerImage(docker);
     }
 
     public static void stopDockerInstance(Docker docker) throws IOException {

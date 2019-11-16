@@ -19,7 +19,7 @@ public class Docker {
                 "powershell.exe -c " : "env -- ");
         buildCmdTemplate = tmp.append("docker build -f docker-images/%s.jvm -t quarkus/%s-jvm .").toString();
 
-        runCmdTemplate = "docker run -i --rm --name %s -p %s:%s quarkus/%s-jvm";
+        runCmdTemplate = "docker run -d -it --rm --name %s -p %s:%s quarkus/%s-jvm";
         stopCmdTemplate = "docker container stop %s";
     }
 
