@@ -53,16 +53,10 @@ public class ApplicationsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
-
-		String str;
-		String array[];
 		Application app;
-		
 
 		try {
-			str = obj.get("app").toString();
-			str = str.replace('"',' ').trim();
-			array = str.split(":");
+			String[] array = getFromJson(obj, "app");
 			
 			if(!this.appList.appAvailable().contains(array[0]))
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
@@ -79,11 +73,11 @@ public class ApplicationsListRoute {
 			this.appList.add(app);
 			this.appList.increment_app(array[0]);
 			this.idApps++;
-			/*deployDocker(app, port, host);
-			getRunningInstancesNames();
 
-			 */
+			getRunningInstancesNames();
 			dockerInstances.put(app.getid(), app.getDockerInst());
+
+			System.out.println(dockerInstances.toString());
 
 		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
@@ -102,34 +96,30 @@ public class ApplicationsListRoute {
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
 
-		 System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
-		 //Stop val = new Stop(appList.getList().get(1),"4m37s");
-
-		String str;
-		String array[];
-
-
+		//System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
+		// Stop val = new Stop(appList.getList().get(1),"4m37s");
 		try {
-			str = obj.get("id").toString();
-			str = str.replace('"',' ').trim();
-			array = str.split(":");
-			/*
-			for(String string : array) {
-				System.out.println(string);
+			String[] array = getFromJson(obj, "id");
+
+			if(!stopDockerInstance(dockerInstances.remove(Integer.parseInt(array[0])))) {
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
+			System.out.println("Running containers after stop = " + dockerInstances.toString());
 
-			 */
-
-			//System.out.println(dockerInstances.get(Integer.parseInt(array[0])));
-
-			stopDockerInstance(dockerInstances.get(Integer.parseInt(array[0])));
-
-		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
+		} catch (NullPointerException e) {
+			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
+		} catch(IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
-		 
-         return Response.status(Status.OK).entity("coucou").build();
+
+         return Response.status(Status.OK).entity("\nFermeture du Docker de l'app avec l'id " + obj.get("id")).build();
     }
+
+	private static String[] getFromJson(JsonObject obj, String key) {
+		String str = obj.get(key).toString();
+		str = str.replace('"', ' ').trim();
+		return str.split(":");
+	}
 }
