@@ -2,6 +2,7 @@ package fr.umlv.square.controllers;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -35,6 +36,8 @@ public class ApplicationsListRoute {
 	private String port;
 	@ConfigProperty(name = "quarkus.http.host")
 	private String host;
+	@ConfigProperty(name = "square.available.apps")
+	private String appAvailable;
 	
 	@Path("/list")
 	@GET
@@ -45,20 +48,24 @@ public class ApplicationsListRoute {
 
 	@Path("/deploy")
 	@POST
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
 
 		String str;
 		String array[];
+		Application app;
+		var listApp = this.appAvailable.split(","); 
 
 		try {
 			str = obj.get("app").toString();
 			str = str.replace('"',' ').trim();
 			array = str.split(":");
-
-			Application app = new Application(205,array[0],Integer.parseInt(array[1]), getUnboundedLocalPort(),"docker-"+205);
+			
+			if(!Arrays.asList(listApp).contains(array[0]))
+				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
+			app = new Application(205,array[0],Integer.parseInt(array[1]), getUnboundedLocalPort(),array[0]+"-"+205);
 
 			this.appList.add(app);
 
@@ -76,7 +83,7 @@ public class ApplicationsListRoute {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 
-		return Response.status(Status.CREATED).build();
+		return Response.status(Status.CREATED).entity(app).build();
     }
 
 	@Path("/stop")
