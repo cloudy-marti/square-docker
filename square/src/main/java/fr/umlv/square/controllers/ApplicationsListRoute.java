@@ -82,8 +82,6 @@ public class ApplicationsListRoute {
 			getRunningInstancesNames();
 			dockerInstances.put(app.getId(), app.getDockerInst());
 
-			//System.out.println(dockerInstances.toString());
-
 		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
 		}catch (IllegalStateException e) {
@@ -100,9 +98,8 @@ public class ApplicationsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
+		Stop stopVal;
 
-		//System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
-		// Stop val = new Stop(appList.getList().get(1),"4m37s");
 		try {
 			String[] array = getFromJson(obj, "id");
 			int id = Integer.parseInt(array[0]);
@@ -116,11 +113,11 @@ public class ApplicationsListRoute {
 			if(!stopDockerInstance(tmpApp.getDockerInst())) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-
+			String elapsedTime = getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis());
+			stopVal = new Stop(tmpApp, elapsedTime);
 			dockerInstances.remove(id);
 
-			Stop stopVal = new Stop(tmpApp, getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis()));
-
+			tmpApp.setElapsedTime(elapsedTime);
 		} catch (NullPointerException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
 		} catch(IndexOutOfBoundsException | NumberFormatException e) {
@@ -128,8 +125,7 @@ public class ApplicationsListRoute {
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
-
-         return Response.status(Status.OK).entity("\nFermeture du Docker de l'app avec l'id " + obj.get("id")).build();
+         return Response.status(Status.OK).entity(Stop.serialize(stopVal)).build();
     }
 
 	private static String[] getFromJson(JsonObject obj, String key) {
@@ -142,9 +138,9 @@ public class ApplicationsListRoute {
 		long elapsedTime = endTime - startTime;
 
 		String timeTemplate = "%sm%ss";
+
 		long seconds = elapsedTime/1000;
 		long minutes = seconds/60;
-
 		seconds = seconds - (minutes*60);
 
 		return String.format(timeTemplate, minutes, seconds);
