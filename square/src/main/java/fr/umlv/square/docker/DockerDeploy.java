@@ -43,19 +43,23 @@ public class DockerDeploy {
         return process;
     }
 
-    public static void deployDocker(Application application, String port, String host) throws IOException {
+    public static boolean deployDocker(Application application, String port, String host) throws IOException {
         DockerFileCompose dockerFile = new DockerFileCompose(application, port, host);
         dockerFile.composeDockerFile();
 
         Docker docker = new Docker(application);
 
         Process buildProcess = buildDockerImage(docker);
+        Process runProcess;
         try {
             buildProcess.waitFor();
-            runDockerImage(docker).waitFor();
+            runProcess = runDockerImage(docker);
+            runProcess.waitFor();
         } catch (InterruptedException e) {
             throw new UndeclaredThrowableException(e);
         }
+        
+        return buildProcess.exitValue() == 0 && runProcess.exitValue() == 0;
     }
 
     public static void stopDockerInstance(Docker docker) throws IOException {
