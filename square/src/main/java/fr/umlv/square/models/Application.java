@@ -1,7 +1,5 @@
 package fr.umlv.square.models;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +19,7 @@ public class Application {
 	private final String docker_instance;
 
 	private final long startTime;
+	private String elapsedTime;
 	
 	public Application(int id, String app, int port, int serv_port, String dock_instance) {
 		this.id = id;
@@ -29,6 +28,7 @@ public class Application {
 		this.service_port = serv_port;
 		this.docker_instance = dock_instance;
 		this.startTime = System.currentTimeMillis();
+		this.elapsedTime = "";
 	}
 	
 	public int getId() {
@@ -59,6 +59,14 @@ public class Application {
 
 	public long getStartTime() {
 		return this.startTime;
+	}
+
+	public String getElapsedTime() {
+		return this.elapsedTime;
+	}
+
+	public void setElapsedTime(String value) {
+		this.elapsedTime = value;
 	}
 	
 	public Map<String, Object> toMap(){
