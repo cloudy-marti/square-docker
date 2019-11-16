@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.swing.text.html.Option;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -22,7 +23,7 @@ public class ApplicationsList {
 	}
 	
 	public ArrayList<Application> getList(){
-		return new ArrayList<Application>(this.list);
+		return new ArrayList<>(this.list);
 	}
 	
 	public Application getOneAppRunning(String dockerInstance){
@@ -44,5 +45,11 @@ public class ApplicationsList {
 
 	public int getDeployID(String appName) {
 		return this.deployCount.getOrDefault(appName, 0);
+	}
+
+	public Optional<Application> getAppById(int id) {
+		return this.list.stream()
+				.filter(app -> app.getId() == id)
+				.findFirst();
 	}
 }

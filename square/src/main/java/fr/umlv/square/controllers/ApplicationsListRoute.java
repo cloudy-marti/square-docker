@@ -1,6 +1,11 @@
 package fr.umlv.square.controllers;
 import java.io.IOException;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import javax.inject.Inject;
@@ -14,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import fr.umlv.square.models.Stop;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import fr.umlv.square.models.Application;
@@ -24,7 +30,6 @@ import static fr.umlv.square.docker.DockerDeploy.*;
 
 @Path("/app")
 public class ApplicationsListRoute {
-	
 
 	@Inject
 	private ApplicationsList appList;
@@ -100,21 +105,21 @@ public class ApplicationsListRoute {
 		// Stop val = new Stop(appList.getList().get(1),"4m37s");
 		try {
 			String[] array = getFromJson(obj, "id");
-
 			int id = Integer.parseInt(array[0]);
-			Optional<String> dockerInstanceName = getRunningInstancesNames().stream()
-					.filter(instance -> instance.endsWith("-" + id))
-					.findFirst();
 
-			if(dockerInstanceName.isEmpty()) {
-				return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer running").build();
+			Optional<Application> tmp = appList.getAppById(id);
+			if(tmp.isEmpty()) {
+				return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
 			}
 
-			if(!stopDockerInstance(dockerInstanceName.get())) {
+			Application tmpApp = tmp.get();
+			if(!stopDockerInstance(tmpApp.getDockerInst())) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-			System.out.println("Running containers after stop = " + dockerInstances.toString());
+
 			dockerInstances.remove(id);
+
+			Stop stopVal = new Stop(tmpApp, getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis()));
 
 		} catch (NullPointerException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
@@ -131,5 +136,17 @@ public class ApplicationsListRoute {
 		String str = obj.get(key).toString();
 		str = str.replace('"', ' ').trim();
 		return str.split(":");
+	}
+
+	private static String getElapsedTime(long startTime, long endTime) {
+		long elapsedTime = endTime - startTime;
+
+		String timeTemplate = "%sm%ss";
+		long seconds = elapsedTime/1000;
+		long minutes = seconds/60;
+
+		seconds = seconds - (minutes*60);
+
+		return String.format(timeTemplate, minutes, seconds);
 	}
 }
