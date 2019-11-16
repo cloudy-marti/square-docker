@@ -29,7 +29,8 @@ public class ApplicationsListRoute {
 	
 
 	@Inject
-	private ApplicationsList appList = new ApplicationsList();
+	private ApplicationsList appList;
+	
 	@ConfigProperty(name = "quarkus.http.port")
 	private String port;
 	@ConfigProperty(name = "quarkus.http.host")
