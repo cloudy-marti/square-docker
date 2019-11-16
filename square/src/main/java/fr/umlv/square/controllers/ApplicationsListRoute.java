@@ -73,7 +73,6 @@ public class ApplicationsListRoute {
 					getUnboundedLocalPort(),
 					array[0]+"-"+ (this.appList.getDeployID(array[0])));
 
-			System.out.println(app.getAppname());
 
 			if(!deployDocker(app, this.port, this.host))
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();

@@ -69,7 +69,7 @@ public class Log extends PanacheEntity {
 					message,
 					date,
 					app.getId(),
-					app.getAppname()					
+					app.getAppname()+":"+app.getPort()					
 				));
 		}
 		Log.persist(l.stream());
