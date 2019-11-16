@@ -12,7 +12,7 @@ public class Docker {
      */
     private static final String buildCmdTemplate;
     private static final String runCmdTemplate;
-    private static final String stopCmdTemplate;
+    //private static final String stopCmdTemplate;
 
     static {
         StringBuilder tmp = new StringBuilder(System.getProperty("os.name").toLowerCase().startsWith("win") ?
@@ -20,16 +20,16 @@ public class Docker {
         buildCmdTemplate = tmp.append("docker build -f docker-images/%s.jvm -t quarkus/%s-jvm .").toString();
 
         runCmdTemplate = "docker run -d -it --rm --name %s -p %s:%s quarkus/%s-jvm";
-        stopCmdTemplate = "docker container stop %s";
+        //stopCmdTemplate = "docker container stop %s";
     }
 
     private final Application application;
 
     private final String[] buildCmd;
     private final String[] runCmd;
-    private final String[] stopCmd;
+    //private final String[] stopCmd;
 
-    private boolean running;
+  //  private boolean running;
 
     public Docker(Application application) {
         Objects.requireNonNull(application);
@@ -38,9 +38,9 @@ public class Docker {
 
         this.buildCmd = String.format(buildCmdTemplate, this.application.getappname(), this.application.getappname()).split(" ");
         this.runCmd = String.format(runCmdTemplate, this.application.getDockerInst(), this.application.getserviceport(), this.application.getport(), this.application.getappname()).split(" ");
-        this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" ");
+       // this.stopCmd = String.format(stopCmdTemplate, this.application.getDockerInst()).split(" ");
 
-        this.running = false;
+     //   this.running = false;
     }
 
     public String[] getBuildCmd() {
@@ -51,9 +51,12 @@ public class Docker {
         return this.runCmd;
     }
 
+    /*
     public String[] getStopCmd() {
         return this.stopCmd;
     }
+
+     */
 
     public String getBuildCmdToString() {
         StringJoiner strJoiner = new StringJoiner(" ");
@@ -71,6 +74,7 @@ public class Docker {
         return strJoiner.toString();
     }
 
+    /*
     public String getStopCmdToString() {
         StringJoiner strJoiner = new StringJoiner(" ");
         for(String str : stopCmd) {
@@ -79,10 +83,15 @@ public class Docker {
         return strJoiner.toString();
     }
 
-    public boolean isDockerRunning() {
+     */
+
+   /* public boolean isDockerRunning() {
         return this.running;
     }
 
+    */
+
+    /*
     public void run() {
         this.running = true;
     }
@@ -90,4 +99,6 @@ public class Docker {
     public void stop() {
         this.running = false;
     }
+
+     */
 }

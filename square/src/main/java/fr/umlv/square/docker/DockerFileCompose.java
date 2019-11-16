@@ -2,14 +2,9 @@ package fr.umlv.square.docker;
 
 import fr.umlv.square.models.Application;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
-
-import javax.inject.Inject;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 public class DockerFileCompose {
 
@@ -31,8 +26,10 @@ public class DockerFileCompose {
                 "FROM openjdk:11\n" +                                               // Base image giving openjdk 11 environment
                 "EXPOSE %s\n" +                                                     // Docker port exposed to host
                 "WORKDIR /workspace/\n" +                                           // Workspace directory
+
                 "ENV SQUARE_PORT=%s\n" +
                 "ENV SQUARE_HOST=%s\n" +
+
                 "COPY lib-client/lib_cliente-runner.jar /workspace/lib.jar\n" +     // Copy files into docker's workspace
                 "COPY apps/%s.jar /workspace/%s.jar\n" +
                 "COPY docker-images/script.sh /workspace/script.sh\n" +
@@ -48,7 +45,7 @@ public class DockerFileCompose {
                 "\nCMD curl -f http://localhost:8080 || exit 1";
     }
 
-    public DockerFileCompose(Application application,String port,String host) throws IOException {
+    public DockerFileCompose(Application application, String port, String host) throws IOException {
         Objects.requireNonNull(application);
 
         this.application = application;

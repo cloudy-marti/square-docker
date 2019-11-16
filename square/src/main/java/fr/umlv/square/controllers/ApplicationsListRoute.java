@@ -2,10 +2,9 @@ package fr.umlv.square.controllers;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.HashMap;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
@@ -22,7 +21,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import fr.umlv.square.models.Application;
 import fr.umlv.square.models.ApplicationsList;
-import fr.umlv.square.models.Stop;
 
 import static fr.umlv.square.docker.DockerDeploy.*;
 
@@ -33,6 +31,8 @@ public class ApplicationsListRoute {
 
 	@Inject
 	private ApplicationsList appList;
+
+	private final HashMap<Integer, String> dockerInstances = new HashMap<>();
 	
 	@ConfigProperty(name = "quarkus.http.port")
 	private String port;
@@ -66,6 +66,7 @@ public class ApplicationsListRoute {
 			
 			if(!this.appList.appAvailable().contains(array[0]))
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
+
 			app = new Application(
 					this.idApps,array[0],
 					Integer.parseInt(array[1]),
@@ -78,6 +79,11 @@ public class ApplicationsListRoute {
 			this.appList.add(app);
 			this.appList.increment_app(array[0]);
 			this.idApps++;
+			/*deployDocker(app, port, host);
+			getRunningInstancesNames();
+
+			 */
+			dockerInstances.put(app.getid(), app.getDockerInst());
 
 		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
@@ -94,8 +100,35 @@ public class ApplicationsListRoute {
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
+		Objects.requireNonNull(obj);
+
 		 System.out.println("\nFermeture du Docker de l'app avec l'id " + obj.get("id"));
 		 //Stop val = new Stop(appList.getList().get(1),"4m37s");
+
+		String str;
+		String array[];
+
+
+		try {
+			str = obj.get("id").toString();
+			str = str.replace('"',' ').trim();
+			array = str.split(":");
+			/*
+			for(String string : array) {
+				System.out.println(string);
+			}
+
+			 */
+
+			//System.out.println(dockerInstances.get(Integer.parseInt(array[0])));
+
+			stopDockerInstance(dockerInstances.get(Integer.parseInt(array[0])));
+
+		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
+			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+		} catch (IOException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
+		}
 		 
          return Response.status(Status.OK).entity("coucou").build();
     }
