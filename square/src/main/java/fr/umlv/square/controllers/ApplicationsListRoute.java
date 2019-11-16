@@ -48,7 +48,7 @@ public class ApplicationsListRoute {
 
 	@Path("/deploy")
 	@POST
-	@Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
