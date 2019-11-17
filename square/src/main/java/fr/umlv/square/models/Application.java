@@ -7,6 +7,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 
 import fr.umlv.square.serializer.ApplicationSerializer;
 
@@ -20,6 +21,8 @@ public class Application {
 
 	private final long startTime;
 	private String elapsedTime;
+	
+	private String idContainer;
 	
 	public Application(int id, String app, int port, int serv_port, String dock_instance) {
 		this.id = id;
@@ -37,6 +40,11 @@ public class Application {
 
 	public String getAppname() {
 		return this.app;
+	}
+	
+	@JsonbTransient
+	public String getIdCondtainer() {
+		return this.idContainer;
 	}
 	
 	public String getApp() {
@@ -85,5 +93,10 @@ public class Application {
 		        .withSerializers(new ApplicationSerializer());
 		Jsonb jsonb = JsonbBuilder.create(config);
 		return jsonb.toJson(app);
+	}
+
+	public void setIDContainer(String string) {
+		this.idContainer = string;
+		
 	}
 }	

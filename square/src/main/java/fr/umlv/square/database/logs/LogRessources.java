@@ -42,9 +42,11 @@ class LogRessources {
 		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
-			Application a = appli.getOneAppRunning(e.dockerInstance);
-			if(a != null)
-				array.add(new LogsApplication(a, e.message,e.timestamp.toString()));
+			var app = appli.getOneAppRunning(e.dockerInstance);
+			if(app.isPresent()) {
+				array.add(new LogsApplication(app.get(), e.message,e.timestamp.toString()));
+
+			}
 		});
 		return array;
 	}

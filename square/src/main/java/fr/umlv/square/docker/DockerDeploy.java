@@ -65,6 +65,8 @@ public class DockerDeploy {
             throw new UndeclaredThrowableException(e);
         }
         
+        String stdout = IOUtils.toString(runProcess.getInputStream(), "UTF-8");
+        application.setIDContainer(stdout.split("\n")[0]);
         return buildProcess.exitValue() == 0 && runProcess.exitValue() == 0;
     }
 

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.swing.text.html.Option;
@@ -26,13 +28,20 @@ public class ApplicationsList {
 		return new ArrayList<>(this.list);
 	}
 	
-	public Application getOneAppRunning(String dockerInstance){
+	public Optional<Application> getOneAppRunning(String dockerInstance){
 		Optional<Application> op = this.list.stream().
 									filter(e -> dockerInstance.equals(e.getDockerInst())).
 									findFirst();
-		if (op.isEmpty())
-			return null;
-		return op.get();
+		return op;
+	}
+	
+	public Optional<Application> getOneAppRunningByID(String id){
+        Pattern pattern = Pattern.compile("^".concat(id).concat(".*"));
+        System.out.println(id + this.getList().get(0).getIdCondtainer());
+		Optional<Application> op = this.list.stream().
+									filter(e -> pattern.matcher(e.getIdCondtainer()).matches()).
+									findFirst();
+		return op;
 	}
 	
 	public void increment_app(String app_name) {

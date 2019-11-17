@@ -25,7 +25,6 @@ public class LogsListRoute {
 
 	@Inject
 	ApplicationsList listApp;
-	
 
 	@Path("/{time}")
 	@GET
@@ -34,26 +33,27 @@ public class LogsListRoute {
 	public Response getTime(@PathParam("time") int time) {
 		return Response.status(200).entity(LogsApplication.listToJson(Log.getByTime(time, this.listApp))).build();
 	}
-	
+
 	@Path("/{time}/{filter}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") String filter) {
-		return Response.status(200).
-				entity(LogsApplication.listToJson(Log.getByTimeAndFilter(time, filter, this.listApp))).
-				build();
+		return Response.status(200)
+				.entity(LogsApplication.listToJson(Log.getByTimeAndFilter(time, filter, this.listApp))).build();
 	}
-	
+
 	@Path("")
-	@POST	
-    @Produces(MediaType.APPLICATION_JSON)
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-    public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
-		 var app = this.listApp.getOneAppRunning("demo-0");  
-		 boolean res = Log.addLogs(obj, app);
-        return res ? 
-       		Response.status(Status.CREATED).build() : 
-       		Response.status(Status.NOT_ACCEPTABLE).build();
-    }
+	public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
+		System.out.println(id);
+		var app = this.listApp.getOneAppRunningByID(id);
+		if (app.isEmpty())
+			Response.status(Status.NOT_ACCEPTABLE).build();
+
+		boolean res = Log.addLogs(obj, app.get());
+		return res ? Response.status(Status.CREATED).build() : Response.status(Status.NOT_ACCEPTABLE).build();
+	}
 }
