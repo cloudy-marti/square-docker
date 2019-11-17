@@ -37,7 +37,6 @@ public class ApplicationsList {
 	
 	public Optional<Application> getOneAppRunningByID(String id){
         Pattern pattern = Pattern.compile("^".concat(id).concat(".*"));
-        System.out.println(id + this.getList().get(0).getIdCondtainer());
 		Optional<Application> op = this.list.stream().
 									filter(e -> pattern.matcher(e.getIdCondtainer()).matches()).
 									findFirst();

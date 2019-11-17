@@ -48,7 +48,6 @@ public class LogsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
-		System.out.println(id);
 		var app = this.listApp.getOneAppRunningByID(id);
 		if (app.isEmpty())
 			Response.status(Status.NOT_ACCEPTABLE).build();

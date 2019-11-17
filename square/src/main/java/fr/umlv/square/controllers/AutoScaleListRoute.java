@@ -42,7 +42,6 @@ public class AutoScaleListRoute {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response update(JsonObject obj) {
-		System.out.println(obj);
 		data.addToMap("todomvc:8082", "no action");
 		data.addToMap("demo:8083", "need to stop 2 instance(s)");
 		return Response.status(Status.OK).entity(data.getMap()).build();
