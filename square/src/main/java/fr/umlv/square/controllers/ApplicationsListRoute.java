@@ -5,6 +5,8 @@ import java.util.*;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
+import javax.persistence.Transient;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -28,8 +30,6 @@ public class ApplicationsListRoute {
 
 	@Inject
 	private ApplicationsList appList;
-
-	private final HashMap<Integer, String> dockerInstances = new HashMap<>();
 	
 	@ConfigProperty(name = "quarkus.http.port")
 	private String port;
@@ -47,6 +47,7 @@ public class ApplicationsListRoute {
 		return str.toString();
 	}
 
+	@Transactional
 	@Path("/deploy")
 	@POST
 	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
@@ -54,7 +55,6 @@ public class ApplicationsListRoute {
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
 		Application app;
-
 		try {
 			String[] array = getFromJson(obj, "app");
 			
@@ -71,13 +71,12 @@ public class ApplicationsListRoute {
 
 			if(!deployDocker(app, this.port, this.host))
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-
 			this.appList.add(app);
 			this.appList.increment_app(array[0]);
 			this.idApps++;
+			app.addInBDD();
 
 			getRunningInstancesNames();
-			dockerInstances.put(app.getId(), app.getDockerInst());
 
 		} catch(NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
@@ -112,7 +111,6 @@ public class ApplicationsListRoute {
 			}
 			String elapsedTime = getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis());
 			stopVal = new Stop(tmpApp, elapsedTime);
-			dockerInstances.remove(id);
 
 			tmpApp.setElapsedTime(elapsedTime);
 		} catch (NullPointerException e) {

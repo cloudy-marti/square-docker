@@ -1,6 +1,11 @@
 package fr.umlv.square.database;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.ForeignKey;
@@ -28,32 +33,27 @@ import javax.json.JsonObject;
 
 @Entity
 public class Log extends PanacheEntity {
-    @NotBlank
-    public String message;
-    @NotBlank
-    public OffsetDateTime timestamp;
-    @NotBlank
-	public String dockerInstance;
-	@NotBlank
-	public int idApp;
-	@NotBlank
-	public String appName;
+
+	@Column(name = "MESSAGE_LOG", nullable = false)
+	public String message;
 	
-	private Log(String dockerI, String message, OffsetDateTime timestamp, int idApp, String appName) {
-		Objects.requireNonNull(dockerI);
+	@Column(name = "TIMESTAMP_LOG", nullable = false)
+	public OffsetDateTime timestamp;
+	
+    @ManyToOne
+    @JoinColumn(name ="FK_APPLICATION")
+    private Application app;
+   	
+	private Log(String message, OffsetDateTime timestamp, Application app) {
 		Objects.requireNonNull(message);
+		Objects.requireNonNull(app);
 		Objects.requireNonNull(timestamp);
-		Objects.requireNonNull(idApp);
-		Objects.requireNonNull(appName);
 		this.message = message;
 		this.timestamp = timestamp;
-		this.dockerInstance = dockerI;
-		this.idApp = idApp;
-		this.appName = appName;
+		this.app = app;
 	}
 	
 	public Log() {}
-	
 	
 
 
@@ -66,11 +66,9 @@ public class Log extends PanacheEntity {
 			
 			OffsetDateTime date = getDateOrDefault(message, defaultDate);
 			l.add(new Log(
-					app.getDockerInst(), 
 					message,
-					date,
-					app.getId(),
-					app.getAppname()+":"+app.getPort()					
+					date, 
+					app
 				));
 		}
 		Log.persist(l.stream());
@@ -81,13 +79,12 @@ public class Log extends PanacheEntity {
 		Pattern pattern = Pattern.compile("[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]");
 		Matcher matcher = pattern.matcher(message);
 		String find;
-		OffsetDateTime o1, o2 = null;
+		OffsetDateTime o1, o2 = OffsetDateTime.parse(defaultDate);;
 		if (matcher.find())
 		{
 		    find = matcher.group(0);
 		    find = find.replace(" ", "T").concat("Z");
 		    o1 = OffsetDateTime.parse(find);
-		    o2 = OffsetDateTime.parse(defaultDate);
 		    var timer = ChronoUnit.SECONDS.between(o1, o2);
 		    if(timer <= 60 && timer >= -60)
 		    	return o1;
@@ -110,6 +107,10 @@ public class Log extends PanacheEntity {
 
 	public static List<LogsApplication> getByTimeAndFilter(int time, String filter, ApplicationsList listApp) {
 		return LogRessources.getByTimeAndFilter(getTimed(time), filter, listApp);	
+	}
+
+	public Application getApp() {
+		return this.app;
 	}
 
 }

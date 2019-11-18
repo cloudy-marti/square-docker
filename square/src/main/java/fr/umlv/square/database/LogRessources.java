@@ -2,7 +2,9 @@ package fr.umlv.square.database;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -13,26 +15,21 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 class LogRessources {
 	@Transactional
 	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time, ApplicationsList appli){
-		String queryString = "timestamp > ?1";
+		String queryString = "TIMESTAMP_LOG > ?1";
 		return getData(queryString, appli, time);
 	}
 	
-	public static ArrayList<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
+	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
 		int value;
-		String queryString;
-		String queryString2 = "and timestamp > ?2";
-		if((value = isNumeric(filter)) > -1) {
-			queryString = "idapp = ?1 ".concat(queryString2);
-			return getData(queryString, appli, value, time);
-		}
-		else if(isName(filter)) {
-			queryString = "appname = ?1 ".concat(queryString2);
-			return getData(queryString, appli, filter, time);
-		}
-		else if(isInstance(filter)) {	
-			queryString = "dockerinstance = ?1 ".concat(queryString2);
-			return getData(queryString, appli, filter, time);			
-		}
+		String queryString = "TIMESTAMP_LOG > ?1";
+		if((value = isNumeric(filter)) > -1) 
+			return getData(queryString, appli, time).stream().filter(e -> value == e.getApplication().getId()).collect(Collectors.toList());
+		
+		else if(isName(filter))
+			return getData(queryString, appli, time).stream().filter(e -> e.getApplication().getApp().equals(filter)).collect(Collectors.toList());
+		
+		else if(isInstance(filter))
+				return getData(queryString, appli, time).stream().filter(e -> e.getApplication().getDockerInst().equals(filter)).collect(Collectors.toList());
 		else
 			throw new IllegalArgumentException();
 	}
@@ -41,11 +38,7 @@ class LogRessources {
 		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
-			var app = appli.getOneAppRunning(e.dockerInstance);
-			if(app.isPresent()) {
-				array.add(new LogsApplication(app.get(), e.message,e.timestamp.toString()));
-
-			}
+				array.add(new LogsApplication(e.getApp(), e.message,e.timestamp.toString()));
 		});
 		return array;
 	}
