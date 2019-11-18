@@ -1,7 +1,9 @@
-package fr.umlv.square.database.logs;
+package fr.umlv.square.database;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.ForeignKey;
 
 import fr.umlv.square.models.Application;
 import fr.umlv.square.models.ApplicationsList;

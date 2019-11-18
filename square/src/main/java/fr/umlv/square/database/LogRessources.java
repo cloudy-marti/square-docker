@@ -1,4 +1,4 @@
-package fr.umlv.square.database.logs;
+package fr.umlv.square.database;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
