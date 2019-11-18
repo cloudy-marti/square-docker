@@ -1,5 +1,6 @@
 package fr.umlv.square.models;
 
+import fr.umlv.square.database.Application;
 import fr.umlv.square.serializer.StopSerializer;
 
 import java.util.Objects;

@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import fr.umlv.square.models.Application;
 import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;

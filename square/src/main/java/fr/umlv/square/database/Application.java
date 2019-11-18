@@ -1,4 +1,4 @@
-package fr.umlv.square.models;
+package fr.umlv.square.database;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +8,13 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
+import javax.persistence.Entity;
 
 import fr.umlv.square.serializer.ApplicationSerializer;
 
+@Entity
 public class Application {
+	
 	private final int id;
 	private final String app;
 	private final int port;
@@ -31,11 +34,10 @@ public class Application {
 		this.service_port = serv_port;
 		this.docker_instance = dock_instance;
 		this.startTime = System.currentTimeMillis();
-		this.elapsedTime = "";
 	}
 	
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getAppname() {
@@ -48,21 +50,21 @@ public class Application {
 	}
 	
 	public String getApp() {
-		return app+':'+port;
+		return this.app+':'+this.port;
 	}
 
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 	
 	@JsonbProperty("service-port")
 	public int getServicePort() {
-		return service_port;
+		return this.service_port;
 	}
 	
 	@JsonbProperty("docker-instance")
 	public String getDockerInst() {
-		return docker_instance;
+		return this.docker_instance;
 	}
 
 	public long getStartTime() {
@@ -77,16 +79,6 @@ public class Application {
 		this.elapsedTime = value;
 	}
 	
-	public Map<String, Object> toMap(){
-		Map<String,Object> map = new HashMap<String, Object>();
-		map.put("id", id);
-		map.put("app", getApp());
-		map.put("port", port);
-		map.put("service-port", service_port);
-		map.put("docker-instance", docker_instance);
-		
-		return map;
-	}
 	
 	public static String serialize(Application app) {
 		JsonbConfig config = new JsonbConfig()

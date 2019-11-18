@@ -1,6 +1,6 @@
 package fr.umlv.square.serializer;
 
-import fr.umlv.square.models.Application;
+import fr.umlv.square.database.Application;
 import fr.umlv.square.models.Stop;
 
 import javax.json.bind.serializer.JsonbSerializer;

@@ -1,9 +1,9 @@
 package fr.umlv.square.docker;
 
-import fr.umlv.square.models.Application;
-
 import java.util.Objects;
 import java.util.StringJoiner;
+
+import fr.umlv.square.database.Application;
 
 public class Docker {
 

@@ -10,6 +10,7 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbTransient;
 
+import fr.umlv.square.database.Application;
 import fr.umlv.square.serializer.ApplicationSerializer;
 import fr.umlv.square.serializer.LogsApplicationSerializer;
 

@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import fr.umlv.square.database.logs.Log;
+import fr.umlv.square.database.Log;
 import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 

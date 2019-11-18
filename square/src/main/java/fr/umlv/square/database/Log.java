@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.ForeignKey;
 
-import fr.umlv.square.models.Application;
 import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;

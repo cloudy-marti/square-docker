@@ -13,6 +13,8 @@ import javax.swing.text.html.Option;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import fr.umlv.square.database.Application;
+
 @ApplicationScoped
 public class ApplicationsList {
 	private ArrayList<Application> list = new ArrayList<>();
