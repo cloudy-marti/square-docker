@@ -3,38 +3,37 @@ package fr.umlv.square.database;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 class LogRessources {
 	@Transactional
-	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time, ApplicationsList appli){
-		String queryString = "TIMESTAMP_LOG > ?1";
-		return getData(queryString, appli, time);
+	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time){
+		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
+		return getData(queryString, time);
 	}
 	
-	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter, ApplicationsList appli){
+	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
 		int value;
-		String queryString = "TIMESTAMP_LOG > ?1";
+		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
 		if((value = isNumeric(filter)) > -1) 
-			return getData(queryString, appli, time).stream().filter(e -> value == e.getApplication().getId()).collect(Collectors.toList());
+			return getData(queryString, time).stream().filter(e -> value == e.getApplication().getId()).collect(Collectors.toList());
 		
 		else if(isName(filter))
-			return getData(queryString, appli, time).stream().filter(e -> e.getApplication().getApp().equals(filter)).collect(Collectors.toList());
+			return getData(queryString, time).stream().filter(e -> e.getApplication().getApp().equals(filter)).collect(Collectors.toList());
 		
 		else if(isInstance(filter))
-				return getData(queryString, appli, time).stream().filter(e -> e.getApplication().getDockerInst().equals(filter)).collect(Collectors.toList());
+				return getData(queryString, time).stream().filter(e -> e.getApplication().getDockerInst().equals(filter)).collect(Collectors.toList());
 		else
 			throw new IllegalArgumentException();
 	}
-	
-	private static ArrayList<LogsApplication> getData(String queryString, ApplicationsList appli, Object... params){
+
+	@SuppressWarnings("static-access")
+	private static ArrayList<LogsApplication> getData(String queryString, Object... params){
 		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
@@ -66,5 +65,10 @@ class LogRessources {
 		catch(NumberFormatException e) {
 			return -1;
 		}
+	}
+
+	@Transactional
+	public static void disableApp(List<Application> appToDisable) {
+		appToDisable.forEach(e -> e.persistAndFlush());			
 	}
 }

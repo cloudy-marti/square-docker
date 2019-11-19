@@ -17,6 +17,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import fr.umlv.square.models.Stop;
+import fr.umlv.square.utils.Counter;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import fr.umlv.square.database.Application;
@@ -28,19 +30,28 @@ import static fr.umlv.square.docker.DockerDeploy.*;
 @Path("/app")
 public class ApplicationsListRoute {
 
-	@Inject
-	private ApplicationsList appList;
+	private final ApplicationsList appList;
+	private final String port;
+	private final String host;	
 	
-	@ConfigProperty(name = "quarkus.http.port")
-	private String port;
-	@ConfigProperty(name = "quarkus.http.host")
-	private String host;	
-	private int idApps;
+	@Inject
+	public ApplicationsListRoute(
+		@ConfigProperty(name = "quarkus.http.port") String port,
+		@ConfigProperty(name = "quarkus.http.host") String host,
+		ApplicationsList appList)
+	{
+		this.host = host;
+		this.port = port;
+		this.appList = appList;
+		
+	}
 
 	@Path("/list")
-	@GET
+	@GET	
+	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public String list() {
+		this.appList.initApplicationsList();
 		StringBuilder str = new StringBuilder();
 		for(var elem : this.appList.getList())
 			str.append(Application.serialize(elem));
@@ -54,6 +65,7 @@ public class ApplicationsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
+		this.appList.initApplicationsList();
 		Application app;
 		try {
 			String[] array = getFromJson(obj, "app");
@@ -62,18 +74,15 @@ public class ApplicationsListRoute {
 				return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 			
 			app = new Application(
-					this.idApps,
+					this.appList.getCount(),
 					array[0],
 					Integer.parseInt(array[1]),
 					getUnboundedLocalPort(),
 					array[0]+"-"+ (this.appList.getDeployID(array[0])));
 
-
 			if(!deployDocker(app, this.port, this.host))
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			this.appList.add(app);
-			this.appList.increment_app(array[0]);
-			this.idApps++;
+			this.appList.add(app, array[0]);
 			app.addInBDD();
 
 			getRunningInstancesNames();
@@ -88,14 +97,15 @@ public class ApplicationsListRoute {
 		return Response.status(Status.CREATED).entity(Application.serialize(app)).build();
     }
 
+	@Transactional
 	@Path("/stop")
 	@POST
 	@Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
+		this.appList.initApplicationsList();
 		Stop stopVal;
-
 		try {
 			String[] array = getFromJson(obj, "id");
 			int id = Integer.parseInt(array[0]);
@@ -109,6 +119,7 @@ public class ApplicationsListRoute {
 			if(!stopDockerInstance(tmpApp.getDockerInst())) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
+			this.appList.deleteApp(tmpApp);
 			String elapsedTime = getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis());
 			stopVal = new Stop(tmpApp, elapsedTime);
 

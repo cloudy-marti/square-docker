@@ -21,6 +21,7 @@ import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 
 @Path("/logs")
+@SuppressWarnings("static-method")
 public class LogsListRoute {
 
 	@Inject
@@ -31,15 +32,16 @@ public class LogsListRoute {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response getTime(@PathParam("time") int time) {
-		return Response.status(200).entity(LogsApplication.listToJson(Log.getByTime(time, this.listApp))).build();
+		return Response.status(200).entity(LogsApplication.listToJson(Log.getByTime(time))).build();
 	}
 
+	
 	@Path("/{time}/{filter}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") String filter) {
 		return Response.status(200)
-				.entity(LogsApplication.listToJson(Log.getByTimeAndFilter(time, filter, this.listApp))).build();
+				.entity(LogsApplication.listToJson(Log.getByTimeAndFilter(time, filter))).build();
 	}
 
 	@Path("")
@@ -51,7 +53,6 @@ public class LogsListRoute {
 		var app = this.listApp.getOneAppRunningByID(id);
 		if (app.isEmpty())
 			Response.status(Status.NOT_ACCEPTABLE).build();
-
 		boolean res = Log.addLogs(obj, app.get());
 		return res ? Response.status(Status.CREATED).build() : Response.status(Status.NOT_ACCEPTABLE).build();
 	}

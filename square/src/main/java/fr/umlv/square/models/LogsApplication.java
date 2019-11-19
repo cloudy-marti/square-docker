@@ -1,8 +1,6 @@
 package fr.umlv.square.models;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.json.bind.Jsonb;
@@ -11,7 +9,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbTransient;
 
 import fr.umlv.square.database.Application;
-import fr.umlv.square.serializer.ApplicationSerializer;
 import fr.umlv.square.serializer.LogsApplicationSerializer;
 
 

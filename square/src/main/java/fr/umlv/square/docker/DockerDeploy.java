@@ -84,10 +84,15 @@ public class DockerDeploy {
         return stopProcess.exitValue() == 0;
     }
 
-    public static List<String> getRunningInstancesNames() throws IOException {
+    public static List<String> getRunningInstancesNames() {
 
         ProcessBuilder dockerPs = new ProcessBuilder(("docker ps --format '{{.Names}}'").split(" "));
-        String output = IOUtils.toString(dockerPs.start().getInputStream(), StandardCharsets.UTF_8);
+        String output;
+		try {
+			output = IOUtils.toString(dockerPs.start().getInputStream(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+            throw new UndeclaredThrowableException(e);
+		}
 
         return Arrays.asList(output.replace("'", "").split("\n"));
     }
