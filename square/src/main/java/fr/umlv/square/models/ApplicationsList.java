@@ -3,6 +3,7 @@ package fr.umlv.square.models;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class ApplicationsList {
 		FALSE, TRUE, IN_PROGRESS
 	}
 
-	private ArrayList<Application> list = new ArrayList<>();
+	private final ArrayList<Application> list = new ArrayList<>();
 
 	@ConfigProperty(name = "square.available.apps")
 	private String appAvailable;
@@ -88,8 +89,8 @@ public class ApplicationsList {
 			return this.idApps.getCount();
 		}
 	}
-
-	public void initApplicationsList() {
+	
+	public void wrapperInit() {
 		synchronized (this.lock) {
 			while (IsUpToDate.IN_PROGRESS == this.isUpToDate)
 				try {
@@ -100,13 +101,26 @@ public class ApplicationsList {
 			if (this.isUpToDate == IsUpToDate.TRUE)
 				return;
 			this.isUpToDate = IsUpToDate.IN_PROGRESS;
+			this.initApplicationsList();
+		}
+	}
+
+	private void initApplicationsList() {
+		synchronized (this.lock) {
 			var listBDD_ = Application.getAllApps().collect(Collectors.toList());
-			this.idApps.add(listBDD_.size());
-			listBDD_ = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
-			this.initHashMap(listBDD_);
-			this.initListApp(listBDD_);
+			if(listBDD_.size() != 0)
+				this.complexInit(listBDD_);
 			this.isUpToDate = IsUpToDate.TRUE;
 			this.lock.notifyAll();
+		}
+	}
+	
+	private void complexInit(List<Application> listBDD_) {
+		synchronized (this.lock) {
+			this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get());
+			var listStreamed = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
+			this.initHashMap(listStreamed);
+			this.initListApp(listStreamed);
 		}
 	}
 

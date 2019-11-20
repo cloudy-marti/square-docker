@@ -51,7 +51,7 @@ public class ApplicationsListRoute {
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
 	public String list() {
-		this.appList.initApplicationsList();
+		this.appList.wrapperInit();
 		StringBuilder str = new StringBuilder();
 		for(var elem : this.appList.getList())
 			str.append(Application.serialize(elem));
@@ -65,7 +65,7 @@ public class ApplicationsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response deploy(JsonObject obj) {
 		Objects.requireNonNull(obj);
-		this.appList.initApplicationsList();
+		this.appList.wrapperInit();
 		Application app;
 		try {
 			String[] array = getFromJson(obj, "app");
@@ -104,7 +104,7 @@ public class ApplicationsListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
     public Response stop(JsonObject obj) {
 		Objects.requireNonNull(obj);
-		this.appList.initApplicationsList();
+		this.appList.wrapperInit();
 		Stop stopVal;
 		try {
 			String[] array = getFromJson(obj, "id");

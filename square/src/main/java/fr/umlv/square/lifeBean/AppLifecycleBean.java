@@ -1,21 +1,28 @@
 package fr.umlv.square.lifeBean;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 
+import fr.umlv.square.database.Application;
+import fr.umlv.square.models.ApplicationsList;
 import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 public class AppLifecycleBean {
-	void onStart(@Observes StartupEvent ev) {
-
+	
+	private final ApplicationsList app;
+	
+	@Inject
+	public AppLifecycleBean(ApplicationsList appL) {
+		this.app = appL;
 	}
+	
+	@Transactional
+	void onStart(@Observes StartupEvent ev) {
+		this.app.wrapperInit();
+	}
+
 }
