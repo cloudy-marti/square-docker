@@ -17,9 +17,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.transaction.Transactional;
 
 import fr.umlv.square.serializer.ApplicationSerializer;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @Entity
 public class Application extends PanacheEntity {
@@ -146,6 +148,14 @@ public class Application extends PanacheEntity {
 	}
 
 	public void update() {
-		this.persistAndFlush();	
+		this.flush();	
+	}
+
+	@Transactional
+	public static void disableOneApp(Application tmpApp) {
+		PanacheQuery<Application> app = find("id = ?1", tmpApp.id);
+		Application val = app.stream().findFirst().get();
+		val.isActive = false;
+		val.flush();
 	}
 }

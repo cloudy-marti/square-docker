@@ -117,7 +117,7 @@ public class ApplicationsList {
 	
 	private void complexInit(List<Application> listBDD_) {
 		synchronized (this.lock) {
-			this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get());
+			this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get() + 1);
 			var listStreamed = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
 			this.initHashMap(listStreamed);
 			this.initListApp(listStreamed);
@@ -156,7 +156,7 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
-			//tmpApp.update();
+			Application.disableOneApp(tmpApp);
 		}		
 	}
 }
