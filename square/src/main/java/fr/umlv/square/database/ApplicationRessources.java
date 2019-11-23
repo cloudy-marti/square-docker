@@ -9,7 +9,6 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 class ApplicationRessources {
 	@Transactional
-	@SuppressWarnings("static-access")
 	public static Stream<Application> getApplications(){
 		PanacheQuery<Application> apps = Application.findAll();
 		return apps.stream();

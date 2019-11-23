@@ -69,6 +69,6 @@ class LogRessources {
 
 	@Transactional
 	public static void disableApp(List<Application> appToDisable) {
-		appToDisable.forEach(e -> e.persistAndFlush());			
+		appToDisable.forEach(e -> e.flush());			
 	}
 }
