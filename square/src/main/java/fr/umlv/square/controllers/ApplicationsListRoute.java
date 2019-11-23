@@ -64,7 +64,7 @@ public class ApplicationsListRoute {
 		Objects.requireNonNull(obj);
 		this.check_init();
 		try {
-			return this.deployApp(obj);
+			return this.deployApp(getFromJson(obj, "app"));
 		} catch (NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
 		} catch (IllegalStateException e) {
@@ -73,9 +73,12 @@ public class ApplicationsListRoute {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
+	
+	public Response deployingApp(String[] array) throws IOException{
+		return this.deployApp(array);
+	}
 
-	private Response deployApp(JsonObject obj) throws IOException {
-		String[] array = getFromJson(obj, "app");
+	private Response deployApp(String[] array) throws IOException {
 		Application app;
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
@@ -97,7 +100,7 @@ public class ApplicationsListRoute {
 		Objects.requireNonNull(obj);
 		this.check_init();
 		try {
-			return this.stopApp(obj);
+			return this.stopApp(getFromJson(obj, "id")[0]);
 		} catch (NullPointerException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
 		} catch (IndexOutOfBoundsException | NumberFormatException e) {
@@ -106,11 +109,14 @@ public class ApplicationsListRoute {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
+	
+	public Response stoppingApp(String idApp) throws IOException{
+		return this.stopApp(idApp);
+	}
 
-	private Response stopApp(JsonObject obj) throws IOException {
+	private Response stopApp(String idApp) throws IOException {
 		Stop stopVal;
-		String[] array = getFromJson(obj, "id");
-		Optional<Application> tmp = appList.getAppById(Integer.parseInt(array[0]));
+		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
 		}
