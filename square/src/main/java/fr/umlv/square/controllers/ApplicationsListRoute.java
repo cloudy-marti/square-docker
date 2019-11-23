@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import java.util.*;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.persistence.Transient;
@@ -22,11 +23,12 @@ import fr.umlv.square.utils.Counter;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.models.ApplicationsList;
 
 import static fr.umlv.square.docker.DockerDeploy.*;
 
+@ApplicationScoped
 @Path("/app")
 public class ApplicationsListRoute {
 

@@ -1,9 +1,11 @@
-package fr.umlv.square.database;
+package fr.umlv.square.database.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import java.text.DateFormat;
@@ -82,23 +84,6 @@ public class Log extends PanacheEntity {
 		    	return o1;
 		}
 		return o2;
-	}
-	
-	private static OffsetDateTime getTimed(int timer) {
-        TimeZone tz = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-        df.setTimeZone(tz);
-        Instant instant = Instant.parse(df.format(new Date()));
-        OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));	
-        return time.minusMinutes(timer);	
-	}
-
-	public static ArrayList<LogsApplication> getByTime(int timer) {
-		return LogRessources.getByTime(getTimed(timer));		
-	}
-
-	public static List<LogsApplication> getByTimeAndFilter(int time, String filter) {
-		return LogRessources.getByTimeAndFilter(getTimed(time), filter);	
 	}
 
 	public Application getApp() {

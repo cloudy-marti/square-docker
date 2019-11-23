@@ -1,4 +1,4 @@
-package fr.umlv.square.database;
+package fr.umlv.square.database.ressources;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import fr.umlv.square.database.entities.Application;
+import fr.umlv.square.database.entities.Log;
 import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
-class LogRessources {
+public class LogRessources {
 	@Transactional
 	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time){
 		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$

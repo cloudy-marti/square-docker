@@ -2,7 +2,7 @@ package fr.umlv.square.docker;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 
 import javax.inject.Inject;
 import javax.swing.text.html.Option;

@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 
 public class DockerFileCompose {
 

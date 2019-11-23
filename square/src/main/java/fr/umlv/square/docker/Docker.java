@@ -3,7 +3,7 @@ package fr.umlv.square.docker;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 
 public class Docker {
 

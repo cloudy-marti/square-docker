@@ -4,7 +4,7 @@
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.models.LogsApplication;
 
 public class LogsApplicationSerializer implements JsonbSerializer<LogsApplication> {

@@ -1,8 +1,7 @@
-package fr.umlv.square.database;
+package fr.umlv.square.database.entities;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -19,6 +18,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
+import fr.umlv.square.database.ressources.ApplicationRessources;
+import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.serializer.ApplicationSerializer;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;

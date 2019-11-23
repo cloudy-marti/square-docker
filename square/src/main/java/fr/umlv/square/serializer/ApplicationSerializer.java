@@ -4,7 +4,7 @@ import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 
 public class ApplicationSerializer implements JsonbSerializer<Application> {
 	@Override

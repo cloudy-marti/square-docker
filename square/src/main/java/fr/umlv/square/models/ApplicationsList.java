@@ -18,7 +18,7 @@ import javax.sql.rowset.spi.SyncFactory;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.Hibernate;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.docker.DockerDeploy;
 import fr.umlv.square.utils.Counter;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
