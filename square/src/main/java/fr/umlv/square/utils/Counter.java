@@ -5,6 +5,7 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Counter {
 	private int count;
+	private int currentNumber;
 	private final Object lock = new Object();
 	
 	public Counter(int count) {
@@ -12,6 +13,7 @@ public class Counter {
 			this.count = count;
 		}
 	}
+	
 	
 	public Counter(){}
 
@@ -28,6 +30,29 @@ public class Counter {
 		}
 	}
 	
+	public void UpdateCurrentCounter(int number) {
+		synchronized (this.lock) {
+			this.currentNumber = number;
+		}
+	}
+	
+	public void incCurrentNumber() {
+		synchronized (this.lock) {
+			this.currentNumber++;
+		}
+	}	
+	
+	public void decCurrentNumber() {
+		synchronized (this.lock) {
+			this.currentNumber--;
+		}
+	}	
+	
+	public int getCurrentNumber() {
+		synchronized (this.lock) {
+			return this.currentNumber;
+		}
+	}
 	public int getCount() {
 		synchronized (this.lock) {
 			return this.count;

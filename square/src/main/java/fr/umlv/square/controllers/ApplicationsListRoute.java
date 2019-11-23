@@ -80,12 +80,11 @@ public class ApplicationsListRoute {
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 		app = new Application(this.appList.getCount(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
-				array[0] + "-" + (this.appList.getDeployID(array[0])));
+				array[0] + "-" + (this.appList.getDeployID(array[0],Integer.parseInt(array[1]))));
 		if (!deployDocker(app, this.port, this.host))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		this.appList.add(app, array[0]);
 		app.addInBDD();
-		getRunningInstancesNames();
 		return Response.status(Status.CREATED).entity(Application.serialize(app)).build();
 	}
 

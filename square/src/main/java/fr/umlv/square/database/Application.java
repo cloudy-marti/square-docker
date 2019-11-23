@@ -158,4 +158,5 @@ public class Application extends PanacheEntity {
 		val.isActive = false;
 		val.flush();
 	}
+	
 }

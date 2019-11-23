@@ -32,7 +32,7 @@ public class ApplicationsList {
 	private final ArrayList<Application> list = new ArrayList<>();
 
 	private final ArrayList<String> appAvailable = new ArrayList<>();
-	private final Counter idApps = new Counter();
+	private final Counter idApps = new Counter(1);
 	private HashMap<String, Counter> deployCount = new HashMap<>();
 	private IsUpToDate isUpToDate;
 	private final Object lock = new Object();
@@ -45,6 +45,7 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			this.list.add(a);
 			this.idApps.add(1);
+			this.deployCount.get(a.getApp()).incCurrentNumber();
 		}
 	}
 
@@ -73,10 +74,9 @@ public class ApplicationsList {
 		return this.appAvailable;
 	}
 
-	public int getDeployID(String appName) {
+	public int getDeployID(String appName, int port) {
 		synchronized (this.lock) {
-			this.deployCount.compute(appName, (key, value) -> value == null ? new Counter(0) : value.inc())
-					.getCount();
+			this.deployCount.compute(appName + ":" + port, (key, value) -> value == null ? new Counter(1) : value.inc());
 			int res = 0;
 			for(var key : this.deployCount.keySet()) {
 				res += key.split(":")[0].equals(appName) ? this.deployCount.get(key).getCount() : 0; 
@@ -122,11 +122,19 @@ public class ApplicationsList {
 	}
 
 	private void complexInit(List<Application> listBDD_) {
-		this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get() + 1);
+		this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get());
 		var listStreamed = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
 		this.initHashMap(listBDD_);
 		this.initListApp(listStreamed);
+		this.initCurrentNumberApps();
 
+	}
+	
+	private void initCurrentNumberApps() {
+		for(var elem : this.list) {
+			this.deployCount.get(elem.getApp()).incCurrentNumber();	
+		}
+		
 	}
 
 	private void initListApp(List<Application> list) {
@@ -152,8 +160,8 @@ public class ApplicationsList {
 		while(!copy.isEmpty()) {
 			var elem = copy.get(0);
 			tmp = copy.stream().filter(e -> e.getApp().equals(elem.getApp())).collect(Collectors.toList());
-			var max = tmp.stream().flatMapToInt(e -> IntStream.of(Integer.parseInt(e.getDockerInst().split("-")[1]))).max();
-			this.deployCount.compute(elem.getApp(), (key, value) -> new Counter(max.isPresent() ? max.getAsInt() : 0));
+			int size = tmp.size();
+			this.deployCount.compute(elem.getApp(), (key, value) -> new Counter(size));
 			copy.removeAll(tmp);
 		}
 	}
@@ -163,6 +171,7 @@ public class ApplicationsList {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
 			Application.disableOneApp(tmpApp);
+			this.deployCount.get(tmpApp.getApp()).decCurrentNumber();
 		}
 	}
 
