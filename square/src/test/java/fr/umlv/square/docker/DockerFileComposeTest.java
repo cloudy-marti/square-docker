@@ -2,7 +2,7 @@ package fr.umlv.square.docker;
 
 import org.junit.jupiter.api.Test;
 
-import fr.umlv.square.database.Application;
+import fr.umlv.square.database.entities.Application;
 
 import java.io.File;
 import java.io.IOException;
