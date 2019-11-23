@@ -14,5 +14,13 @@ public class ApplicationRessources {
 		PanacheQuery<Application> apps = Application.findAll();
 		return apps.stream();
 	}
+	
+	@Transactional
+	public static void disableOneApp(Application tmpApp) {
+		PanacheQuery<Application> app = Application.find("id = ?1", tmpApp.id);
+		Application val = app.stream().findFirst().get();
+		val.setActive(false);
+		val.flush();
+	}
 
 }

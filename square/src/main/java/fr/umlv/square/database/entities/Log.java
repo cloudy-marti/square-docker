@@ -27,7 +27,7 @@ import javax.json.JsonObject;
 @Entity
 public class Log extends PanacheEntity {
 
-	@Column(name = "MESSAGE_LOG", nullable = false)
+	@Column(name = "MESSAGE_LOG", nullable = false,length = 555)
 	public String message;
 	
 	@Column(name = "TIMESTAMP_LOG", nullable = false)

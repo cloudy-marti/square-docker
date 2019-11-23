@@ -135,29 +135,13 @@ public class Application extends PanacheEntity {
 		this.idContainer = string;
 	}
 
-	public static Stream<Application> getAllApps() {
-		return ApplicationRessources.getApplications();
-	}
 
 	public boolean matchesWithID(String id) {
 		Pattern pattern = Pattern.compile("^".concat(id).concat(".*"));
 		return pattern.matcher(this.idContainer).matches();
 	}
 
-	public static void disableApp(List<Application> appToDisable) {
-		LogRessources.disableApp(appToDisable);		
-	}
-
 	public void update() {
 		this.flush();	
 	}
-
-	@Transactional
-	public static void disableOneApp(Application tmpApp) {
-		PanacheQuery<Application> app = find("id = ?1", tmpApp.id);
-		Application val = app.stream().findFirst().get();
-		val.isActive = false;
-		val.flush();
-	}
-	
 }

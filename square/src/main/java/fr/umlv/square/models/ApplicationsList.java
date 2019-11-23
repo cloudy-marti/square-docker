@@ -19,6 +19,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hibernate.Hibernate;
 
 import fr.umlv.square.database.entities.Application;
+import fr.umlv.square.database.ressources.ApplicationRessources;
+import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.docker.DockerDeploy;
 import fr.umlv.square.utils.Counter;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -113,7 +115,7 @@ public class ApplicationsList {
 	}
 
 	private void initApplicationsList() {
-		var listBDD_ = Application.getAllApps().collect(Collectors.toList());
+		var listBDD_ = ApplicationRessources.getApplications().collect(Collectors.toList());
 		if (listBDD_.size() != 0)
 			this.complexInit(listBDD_);
 		this.isUpToDate = IsUpToDate.TRUE;
@@ -150,7 +152,7 @@ public class ApplicationsList {
 			}
 			return false;
 		}).collect(Collectors.toList());
-		Application.disableApp(appToDisable);
+		LogRessources.disableApp(appToDisable);	
 
 	}
 
@@ -170,7 +172,7 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
-			Application.disableOneApp(tmpApp);
+			ApplicationRessources.disableOneApp(tmpApp);
 			this.deployCount.get(tmpApp.getApp()).decCurrentNumber();
 		}
 	}
