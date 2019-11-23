@@ -31,12 +31,15 @@ public class ApplicationsList {
 
 	private final ArrayList<Application> list = new ArrayList<>();
 
-	@ConfigProperty(name = "square.available.apps")
-	private String appAvailable;
+	private final ArrayList<String> appAvailable = new ArrayList<>();
 	private final Counter idApps = new Counter();
 	private HashMap<String, Counter> deployCount = new HashMap<>();
 	private IsUpToDate isUpToDate;
 	private final Object lock = new Object();
+
+	public ApplicationsList(@ConfigProperty(name = "square.available.apps") String names) {
+		this.appAvailable.addAll(Arrays.asList(names.split(",")));
+	}
 
 	public void add(Application a, String str) {
 		synchronized (this.lock) {
@@ -67,13 +70,17 @@ public class ApplicationsList {
 	}
 
 	public List<String> appAvailable() {
-		return Arrays.asList(this.appAvailable.split(",")); //$NON-NLS-1$
+		return this.appAvailable;
 	}
 
 	public int getDeployID(String appName) {
 		synchronized (this.lock) {
-			int res = this.deployCount.compute(appName, (key, value) -> value == null ? new Counter(0) : value.inc())
+			this.deployCount.compute(appName, (key, value) -> value == null ? new Counter(0) : value.inc())
 					.getCount();
+			int res = 0;
+			for(var key : this.deployCount.keySet()) {
+				res += key.split(":")[0].equals(appName) ? this.deployCount.get(key).getCount() : 0; 
+			}
 			return res;
 		}
 	}
@@ -89,7 +96,7 @@ public class ApplicationsList {
 			return this.idApps.getCount();
 		}
 	}
-	
+
 	public void wrapperInit() {
 		synchronized (this.lock) {
 			while (IsUpToDate.IN_PROGRESS == this.isUpToDate)
@@ -106,49 +113,48 @@ public class ApplicationsList {
 	}
 
 	private void initApplicationsList() {
-		synchronized (this.lock) {
-			var listBDD_ = Application.getAllApps().collect(Collectors.toList());
-			if(listBDD_.size() != 0)
-				this.complexInit(listBDD_);
-			this.isUpToDate = IsUpToDate.TRUE;
-			this.lock.notifyAll();
-		}
+		var listBDD_ = Application.getAllApps().collect(Collectors.toList());
+		if (listBDD_.size() != 0)
+			this.complexInit(listBDD_);
+		this.isUpToDate = IsUpToDate.TRUE;
+		this.lock.notifyAll();
+
 	}
-	
+
 	private void complexInit(List<Application> listBDD_) {
-		synchronized (this.lock) {
-			this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get() + 1);
-			var listStreamed = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
-			this.initHashMap(listStreamed);
-			this.initListApp(listStreamed);
-		}
+		this.idApps.add(listBDD_.stream().map(e -> e.getId()).max(Comparator.naturalOrder()).get() + 1);
+		var listStreamed = listBDD_.stream().filter(e -> e.isActive()).collect(Collectors.toList());
+		this.initHashMap(listBDD_);
+		this.initListApp(listStreamed);
+
 	}
 
 	private void initListApp(List<Application> list) {
-		synchronized (this.	lock) {
-			var listPS = DockerDeploy.getRunningInstancesNames();
-			var appToDisable = list.stream().filter(e -> {
-				if (e.isActive()) {
-					if (listPS.contains(e.getDockerInst()))
-						this.list.add(e);
-					else {
-						e.setActive(false);
-						return true;
-					}
+		var listPS = DockerDeploy.getRunningInstancesNames();
+		var appToDisable = list.stream().filter(e -> {
+			if (e.isActive()) {
+				if (listPS.contains(e.getDockerInst()))
+					this.list.add(e);
+				else {
+					e.setActive(false);
+					return true;
 				}
-				return false;
-			}).collect(Collectors.toList());
-			Application.disableApp(appToDisable);
-		}
+			}
+			return false;
+		}).collect(Collectors.toList());
+		Application.disableApp(appToDisable);
+
 	}
 
 	private void initHashMap(List<Application> list) {
-		synchronized (this.lock) {
-			Arrays.asList(this.appAvailable.split(",")).forEach(name -> {
-				var max = list.stream().filter(e -> e.getAppname().equals(name))
-						.flatMapToInt(e -> IntStream.of(Integer.parseInt(e.getDockerInst().split("-")[1]))).max();
-				this.deployCount.compute(name, (key, value) -> new Counter(max.isPresent() ? max.getAsInt() : 0));
-			});
+		var copy = new ArrayList<>(list);
+		List<Application> tmp = new ArrayList<>();
+		while(!copy.isEmpty()) {
+			var elem = copy.get(0);
+			tmp = copy.stream().filter(e -> e.getApp().equals(elem.getApp())).collect(Collectors.toList());
+			var max = tmp.stream().flatMapToInt(e -> IntStream.of(Integer.parseInt(e.getDockerInst().split("-")[1]))).max();
+			this.deployCount.compute(elem.getApp(), (key, value) -> new Counter(max.isPresent() ? max.getAsInt() : 0));
+			copy.removeAll(tmp);
 		}
 	}
 
@@ -157,6 +163,19 @@ public class ApplicationsList {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
 			Application.disableOneApp(tmpApp);
-		}		
+		}
+	}
+
+	public void waitStillInit() {
+		synchronized (this.lock) {
+			while(this.isUpToDate != IsUpToDate.TRUE) {
+				try {
+					this.lock.wait();
+				} catch (InterruptedException e) {
+					throw new AssertionError();
+				}
+			}
+		}
+		
 	}
 }
