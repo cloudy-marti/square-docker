@@ -43,7 +43,8 @@ public class Log extends PanacheEntity {
 	/**
 	 * This method saves logs into the database
 	 * @return boolean : true if all was ok
-	 * @param Application for which we will save the logs, List<JsonObject>, from this list we will Log and push it to the databases
+	 * @param app : Application for which we will save the logs
+	 * @param obj : List<JsonObject>, from this list we will Log and push it to the databases
 	 */
 	public static boolean addLogs(List<JsonObject> obj, Application app) {
 		ArrayList <Log> l = new ArrayList<Log>();

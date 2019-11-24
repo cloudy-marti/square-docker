@@ -27,6 +27,11 @@ public class LogsApplication {
 		this.timestamp = tS;
 	}
 	
+	/**
+	 * This method serialize a list of LogsApplication.
+	 * @return String which is the Json of the List.
+	 * @param List<LogsApplication> 
+	 */
 	public static String listToJson(List<LogsApplication>list){
 		StringBuilder str = new StringBuilder();
 		for(var elem : list)
@@ -34,6 +39,7 @@ public class LogsApplication {
 		return str.toString();
 
 	}
+	
 	private static String serialize(LogsApplication app) {
 		JsonbConfig config = new JsonbConfig()
 		        .withSerializers(new LogsApplicationSerializer());

@@ -29,7 +29,8 @@ public class LogRessources {
 	 * This method get all the logs in the Databases after a specific date and filtered by a filed (id, docker instance name
 	 * or 'appName:port').
 	 * @return List<LogsApplication>
-	 * @param OffsetDateTime from which logs are retrieved and a String which is a filter
+	 * @param time : OffsetDateTime from which logs are retrieved 
+	 * @param filter : String which is a filter
 	 * @throws IllegalArgumentException
 	 */
 	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){

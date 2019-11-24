@@ -36,23 +36,42 @@ public class LogsListRoute {
 	@Inject
 	ApplicationsList listApp;
 
+	/**
+	 * This endPoint return logs filtered by a date.
+	 * @return Response.
+	 * @param Int, in minutes the time we will withdraw right now
+	 */
 	@Path("/{time}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response getTime(@PathParam("time") int time) {
+	public Response getLogsByTime(@PathParam("time") int time) {
 		return Response.status(200).entity(LogsApplication.listToJson(LogRessources.getByTime(getTimed(time)))).build();
 	}
 
 	
+	/**
+	 * This endPoint return logs filtered by a date and a filter.
+	 * @return Response.
+	 * @param time, in minutes the time we will withdraw right now
+	 * @Param filter, the filter we gonna apply on the selected logs.
+	 * 
+	 */
 	@Path("/{time}/{filter}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getTimeFiltered(@PathParam("time") int time, @PathParam("filter") String filter) {
+	public Response getLogsByTimeAndFilter(@PathParam("time") int time, @PathParam("filter") String filter) {
 		return Response.status(200)
 				.entity(LogsApplication.listToJson(LogRessources.getByTimeAndFilter(getTimed(time), filter))).build();
 	}
 
+	/**
+	 * This endPoint save logs in the database.
+	 * @return Response.
+	 * @param id, the id of the application to which the logs belong 
+	 * @Param obj, a list of JsonObject who are the logs
+	 * 
+	 */
 	@Path("")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)

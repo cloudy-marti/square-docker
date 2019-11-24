@@ -26,6 +26,11 @@ public class Stop {
 		return this.app;
 	}
 
+	/**
+	 * This method serializes a Stop object.
+	 * @return String which is the Json of the Object.
+	 * @param Stop object we will serialize
+	 */
 	public static String serialize(Stop stop) {
 		JsonbConfig config = new JsonbConfig()
 				.withSerializers(new StopSerializer());
