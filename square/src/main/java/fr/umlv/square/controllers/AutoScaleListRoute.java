@@ -33,12 +33,15 @@ public class AutoScaleListRoute {
 		noAction = "no action";
 	}
 
-	@Inject
-	private ApplicationsList appList;
+	private final ApplicationsList appList;
+
+	private final ApplicationsListRoute appListRoute;
 
 	@Inject
-	ApplicationsListRoute appListRoute;
-
+	public AutoScaleListRoute(ApplicationsList appList, ApplicationsListRoute appListRoute) {
+		this.appList = appList;
+		this.appListRoute = appListRoute;
+	}
 	private AutoScale data = new AutoScale();
 
 	/**
