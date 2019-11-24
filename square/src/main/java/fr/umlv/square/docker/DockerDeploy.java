@@ -29,7 +29,9 @@ public class DockerDeploy {
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
         //System.out.println(new File("../..").getCanonicalPath());
-        processBuilder.directory(new File("../.."));
+
+        String pathName = System.getProperty("user.dir").contains("target") ? "../.." : "../";
+        processBuilder.directory(new File(pathName));
 
         return processBuilder.start();
     }
