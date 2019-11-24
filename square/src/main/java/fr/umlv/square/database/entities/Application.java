@@ -1,10 +1,8 @@
 package fr.umlv.square.database.entities;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -16,13 +14,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-import javax.transaction.Transactional;
 
-import fr.umlv.square.database.ressources.ApplicationRessources;
-import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.serializer.ApplicationSerializer;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @Entity
 public class Application extends PanacheEntity {
@@ -125,6 +119,12 @@ public class Application extends PanacheEntity {
 		this.isActive = false;
 	}
 
+
+	/**
+	 * This method create a Json from an Application
+	 * @return String which correponds to the Json of the Application
+	 * @param Application
+	 */
 	public static String serialize(Application app) {
 		JsonbConfig config = new JsonbConfig().withSerializers(new ApplicationSerializer());
 		Jsonb jsonb = JsonbBuilder.create(config);
@@ -135,7 +135,11 @@ public class Application extends PanacheEntity {
 		this.idContainer = string;
 	}
 
-
+	/**
+	 * This method checks if an ID matches with the ID of the application (this)
+	 * @return true if it matches
+	 * @param String id we gonna check
+	 */
 	public boolean matchesWithID(String id) {
 		Pattern pattern = Pattern.compile("^".concat(id).concat(".*"));
 		return pattern.matcher(this.idContainer).matches();

@@ -5,21 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import fr.umlv.square.database.ressources.LogRessources;
-import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.json.JsonObject;
@@ -49,8 +40,11 @@ public class Log extends PanacheEntity {
 	public Log() {}
 	
 
-
-	@SuppressWarnings("static-access")
+	/**
+	 * This method saves logs into the database
+	 * @return boolean : true if all was ok
+	 * @param Application for which we will save the logs, List<JsonObject>, from this list we will Log and push it to the databases
+	 */
 	public static boolean addLogs(List<JsonObject> obj, Application app) {
 		ArrayList <Log> l = new ArrayList<Log>();
 		for(JsonObject elem : obj) {
