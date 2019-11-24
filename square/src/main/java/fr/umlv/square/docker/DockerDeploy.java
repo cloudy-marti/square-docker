@@ -26,11 +26,9 @@ public class DockerDeploy {
 
     private static Process createAndStartProcessBuilder(String[] cmdLine) throws IOException {
         Objects.requireNonNull(cmdLine);
-
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
-        //System.out.println(new File("../..").getCanonicalPath());
 
-        String pathName = System.getProperty("user.dir").contains("target") ? "../.." : "../";
+        String pathName = System.getProperty("user.dir").contains("target") ? "../.." : "..";
         processBuilder.directory(new File(pathName));
 
         return processBuilder.start();

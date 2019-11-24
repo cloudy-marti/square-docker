@@ -49,8 +49,8 @@ public class DockerFileCompose {
         this.port = port;
         this.host = host;
 
-        String path = System.getProperty("user.dir").contains("target") ? "../.." : "../";
-        this.dockerFilePath = path + "/docker-images/" + this.application.getAppname() + ".jvm";
+        String path = System.getProperty("user.dir").contains("target") ? "../../" : "../";
+        this.dockerFilePath = path + "docker-images/" + this.application.getAppname() + ".jvm";
 
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
