@@ -34,7 +34,6 @@ public class AutoScaleListRoute {
 	}
 
 	private final ApplicationsList appList;
-
 	private final ApplicationsListRoute appListRoute;
 
 	@Inject
@@ -42,7 +41,7 @@ public class AutoScaleListRoute {
 		this.appList = appList;
 		this.appListRoute = appListRoute;
 	}
-	private AutoScale data = new AutoScale();
+	private final AutoScale data = new AutoScale();
 
 	/**
 	 * Stop AutoScale manager.
