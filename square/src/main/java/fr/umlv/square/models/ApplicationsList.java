@@ -7,23 +7,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.sql.rowset.spi.SyncFactory;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.hibernate.Hibernate;
 
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.database.ressources.ApplicationRessources;
 import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.docker.DockerDeploy;
 import fr.umlv.square.utils.Counter;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @ApplicationScoped
 public class ApplicationsList {
@@ -67,8 +61,7 @@ public class ApplicationsList {
 
 	public Optional<Application> getOneAppRunningByID(String id) {
 		synchronized (this.lock) {
-			Optional<Application> op = this.list.stream().filter(e -> e.matchesWithID(id)).findFirst();
-			return op;
+			return this.list.stream().filter(e -> e.matchesWithID(id)).findFirst();
 		}
 	}
 
@@ -90,6 +83,18 @@ public class ApplicationsList {
 	public Optional<Application> getAppById(int id) {
 		synchronized (this.lock) {
 			return this.list.stream().filter(app -> app.getId() == id).findFirst();
+		}
+	}
+
+	public Optional<Application> getAppByNameAndPort(String name) {
+		synchronized (this.lock) {
+			return this.list.stream().filter(app -> app.getApp().equals(name)).findFirst();
+		}
+	}
+
+	public long getCountByNameAndPort(String name) {
+		synchronized (this.lock) {
+			return this.list.stream().filter(app -> app.getApp().equals(name)).count();
 		}
 	}
 

@@ -7,7 +7,6 @@ import java.util.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
-import javax.persistence.Transient;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,7 +18,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import fr.umlv.square.models.Stop;
-import fr.umlv.square.utils.Counter;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -42,9 +40,12 @@ public class ApplicationsListRoute {
 		this.host = host;
 		this.port = port;
 		this.appList = appList;
-
 	}
 
+	/**
+	 * Gets a list of running containers, managed by Square, with a GET request.
+	 * @return Response
+	 */
 	@Path("/list")
 	@GET
 	@Transactional
@@ -57,6 +58,11 @@ public class ApplicationsListRoute {
 		return str.toString();
 	}
 
+	/**
+	 * Starts a container with the wanted application and port exposed by the container with a POST request.
+	 * @param obj : JsonObject to be deserialized and converted into an Application object.
+	 * @return Response
+	 */
 	@Transactional
 	@Path("/deploy")
 	@POST
@@ -75,12 +81,8 @@ public class ApplicationsListRoute {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
-	
-	public Response deployingApp(String[] array) throws IOException{
-		return this.deployApp(array);
-	}
 
-	private Response deployApp(String[] array) throws IOException {
+	public Response deployApp(String[] array) throws IOException {
 		Application app;
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
@@ -93,6 +95,11 @@ public class ApplicationsListRoute {
 		return Response.status(Status.CREATED).entity(Application.serialize(app)).build();
 	}
 
+	/**
+	 * Stops a docker-container from its application's ID with a POST request.
+	 * @param obj : JsonObject to be deserialized
+	 * @return Response
+	 */
 	@Transactional
 	@Path("/stop")
 	@POST
@@ -116,7 +123,7 @@ public class ApplicationsListRoute {
 		return this.stopApp(idApp);
 	}
 
-	private Response stopApp(String idApp) throws IOException {
+	public Response stopApp(String idApp) throws IOException {
 		Stop stopVal;
 		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
@@ -132,7 +139,7 @@ public class ApplicationsListRoute {
 		return Response.status(Status.OK).entity(Stop.serialize(new Stop(tmpApp, elapsedTime))).build();
 	}
 
-	private static String[] getFromJson(JsonObject obj, String key) {
+	public static String[] getFromJson(JsonObject obj, String key) {
 		String str = obj.get(key).toString();
 		str = str.replace('"', ' ').trim();
 		return str.split(":");
