@@ -4,20 +4,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AutoScale {
-	private Map<String, Object> autoScale;
+	private final Map<String, Integer> autoScale;
+	private final Map<String, String> statusMap;
+
+	private boolean running;
 	
 	public AutoScale() {
-		autoScale = new HashMap<String, Object>();
+		this.autoScale = new HashMap<>();
+		this.statusMap = new HashMap<>();
+		this.running = false;
 	}
 	
-	public Map<String, Object> getAutoScale() {
-		return autoScale;
+	public Map<String, Integer> getAutoScale() {
+		return this.autoScale;
 	}
-	public void addToMap(String key, Object value) {
-		autoScale.put(key, value);
+
+	public void addToAutoScale(String key, int value) {
+		this.autoScale.put(key, value);
 	}
 	
-	public Map<String, Object> getMap(){
-		return autoScale;
+	public Map<String, Integer> getMap(){
+		return this.autoScale;
+	}
+
+	public void clearStatus() {
+		this.statusMap.clear();
+	}
+
+	public void addToStatus(String key, String value) {
+		this.statusMap.put(key, value);
+	}
+
+	public Map<String, String> getStatusMap() {
+		return this.statusMap;
+	}
+
+	public boolean isAutoScaleRunning() {
+		return this.running;
+	}
+
+	public void startAutoScale() {
+		this.running = true;
+	}
+
+	public void stopAutoScale() {
+		this.running = false;
 	}
 }
