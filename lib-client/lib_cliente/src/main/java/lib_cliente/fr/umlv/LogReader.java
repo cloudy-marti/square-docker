@@ -84,7 +84,7 @@ public class LogReader {
 			try {
 				HttpClient.newHttpClient().send(requetePost, BodyHandlers.ofString());				
 			} catch (IOException | InterruptedException e) {
-				throw new UndeclaredThrowableException(e);
+				return;
 			}
 		}
 }
