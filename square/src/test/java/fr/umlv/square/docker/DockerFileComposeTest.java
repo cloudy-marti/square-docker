@@ -42,27 +42,4 @@ public class DockerFileComposeTest {
 
         assertTrue(Files.exists(path));
     }
-
-    @Test
-    void assertDockerFileComposeWritesTheRightDockerFile () throws IOException {
-        Application application = new Application(1, "hello", 8080, 8080, "docker");
-
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost");
-        dockerFileCompose.composeDockerFile();
-
-        String tmp =    "FROM openjdk:11\n" +
-                        "EXPOSE 8080\n" +
-                        "WORKDIR /workspace/\n" +
-                        "COPY apps/hello /workspace/hello\n" +
-                        "RUN [\"chmod\",\"+x\",\"hello\"]\n" +
-                        "CMD [\"java\",\"-jar\",\"hello\",\">\",\"log.log\",\"2>&1\"]";
-
-        Scanner scanner = new Scanner(new File(dockerFileCompose.getDockerFilePath()));
-        StringJoiner str = new StringJoiner("\n");
-        while(scanner.hasNext()) {
-            str.add(scanner.nextLine());
-        }
-
-        assertEquals(tmp, str.toString());
-    }
 }
