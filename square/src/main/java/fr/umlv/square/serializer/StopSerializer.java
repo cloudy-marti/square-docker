@@ -9,6 +9,9 @@ import javax.json.stream.JsonGenerator;
 import java.util.Objects;
 
 public class StopSerializer implements JsonbSerializer<Stop> {
+	/**
+	 * This method serialize a Stop object
+	 */
     @Override
     public void serialize(Stop obj, JsonGenerator generator, SerializationContext ctx) {
         Objects.requireNonNull(obj);

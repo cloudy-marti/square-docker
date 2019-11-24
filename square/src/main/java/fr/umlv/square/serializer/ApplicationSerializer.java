@@ -7,6 +7,9 @@ import javax.json.stream.JsonGenerator;
 import fr.umlv.square.database.entities.Application;
 
 public class ApplicationSerializer implements JsonbSerializer<Application> {
+	/**
+	 * This method serialize an Application
+	 */
 	@Override
 	public void serialize(Application obj, JsonGenerator generator, SerializationContext ctx) {
         generator.writeStartObject();

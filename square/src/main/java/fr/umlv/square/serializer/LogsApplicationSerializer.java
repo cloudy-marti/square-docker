@@ -8,6 +8,9 @@ import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.models.LogsApplication;
 
 public class LogsApplicationSerializer implements JsonbSerializer<LogsApplication> {
+	/**
+	 * This method serialize a LogsApplication
+	 */
 	@Override
 	public void serialize(LogsApplication obj, JsonGenerator generator, SerializationContext ctx) {
 		var app = obj.getApplication();

@@ -9,12 +9,20 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 
 public class ApplicationRessources {
+	/**
+	 * This method get all the Applications in the Databases
+	 * @return a Stream<Application>
+	 */
 	@Transactional
 	public static Stream<Application> getApplications(){
 		PanacheQuery<Application> apps = Application.findAll();
 		return apps.stream();
 	}
 	
+	/**
+	 * This method set as false a field in an Application and save it in the Databases
+	 * @param the Application we want to midifie
+	 */
 	@Transactional
 	public static void disableOneApp(Application tmpApp) {
 		PanacheQuery<Application> app = Application.find("id = ?1", tmpApp.id);

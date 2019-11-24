@@ -13,12 +13,25 @@ import fr.umlv.square.models.LogsApplication;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 public class LogRessources {
+	/**
+	 * This method get all the logs in the Databases after a specific date.
+	 * @return ArrayList<LogsApplication>
+	 * @param OffsetDateTime from which logs are retrieved
+	 */
 	@Transactional
 	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time){
 		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
 		return getData(queryString, time);
 	}
 	
+	
+	/**
+	 * This method get all the logs in the Databases after a specific date and filtered by a filed (id, docker instance name
+	 * or 'appName:port').
+	 * @return List<LogsApplication>
+	 * @param OffsetDateTime from which logs are retrieved and a String which is a filter
+	 * @throws IllegalArgumentException
+	 */
 	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
 		int value;
 		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
@@ -34,7 +47,7 @@ public class LogRessources {
 			throw new IllegalArgumentException();
 	}
 
-	@SuppressWarnings("static-access")
+
 	private static ArrayList<LogsApplication> getData(String queryString, Object... params){
 		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
@@ -69,6 +82,10 @@ public class LogRessources {
 		}
 	}
 
+	/**
+	 * This method update a Applications passed in the list.
+	 * @param List<Application>
+	 */
 	@Transactional
 	public static void disableApp(List<Application> appToDisable) {
 		appToDisable.forEach(e -> e.flush());			
