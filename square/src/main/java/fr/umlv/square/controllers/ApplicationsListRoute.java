@@ -16,14 +16,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import fr.umlv.square.models.Stop;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.models.ApplicationsList;
-
 import static fr.umlv.square.docker.DockerDeploy.*;
 
 @ApplicationScoped
