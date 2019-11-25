@@ -36,10 +36,10 @@ public class DockerFileCompose {
                 "RUN [\"chmod\",\"+x\",\"script.sh\"]\n" +
 
                 "RUN [\"sed\", \"-i\", \"s/\\r$//g\", \"script.sh\"]\n" +           // # Remove annoying '\r' Windows characters
-                "CMD [\"bash\", \"script.sh\", \"%s\"]\n" +                         // Run script with bash - Name of demo-app given as a parameter
+                "CMD bash script.sh %s %s \n" +                         // Run script with bash - Name of demo-app given as a parameter
 
                 "HEALTHCHECK --interval=5s --timeout=3s --retries=3 \\" +           // Check app's health
-                "\nCMD curl -f http://localhost:8080 || exit 1";
+                "\nCMD curl -f http://localhost:%s || exit 1";
     }
 
     public DockerFileCompose(Application application, String port, String host) throws IOException {
@@ -67,8 +67,10 @@ public class DockerFileCompose {
                 application.getAppname(),
                 application.getAppname(),
                 application.getAppname(),
+                application.getPort(),
                 application.getAppname(),
-                application.getAppname());
+                application.getPort()
+                );
     }
 
     public void composeDockerFile() throws IOException {

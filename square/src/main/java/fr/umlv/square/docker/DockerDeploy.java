@@ -100,7 +100,9 @@ public class DockerDeploy {
     public static int getUnboundedLocalPort() {
         try(ServerSocket socket = new ServerSocket()) {
             socket.bind(new InetSocketAddress(0));
-            return socket.getLocalPort();
+            var id = socket.getLocalPort();
+            socket.close();
+            return id;
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
