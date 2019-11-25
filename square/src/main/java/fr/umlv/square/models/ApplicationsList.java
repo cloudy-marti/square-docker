@@ -110,7 +110,7 @@ public class ApplicationsList {
 				try {
 					this.lock.wait();
 				} catch (InterruptedException e) {
-					throw new UndeclaredThrowableException(e);
+					throw new AssertionError(e);
 				}
 			if (this.isUpToDate == IsUpToDate.TRUE)
 				return;
