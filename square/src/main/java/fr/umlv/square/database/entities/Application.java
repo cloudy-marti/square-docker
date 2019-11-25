@@ -9,6 +9,7 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ import fr.umlv.square.serializer.ApplicationSerializer;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
+@Cacheable
 public class Application extends PanacheEntity {
 
 	@Column(name = "ID_APP", nullable = false)
@@ -116,7 +118,7 @@ public class Application extends PanacheEntity {
 	}
 	
 	public void setActive(boolean res) {
-		this.isActive = false;
+		this.isActive = res;
 	}
 
 

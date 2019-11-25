@@ -15,8 +15,8 @@ public class ApplicationRessources {
 	 */
 	@Transactional
 	public static Stream<Application> getApplications(){
-		PanacheQuery<Application> apps = Application.findAll();
-		return apps.stream();
+		PanacheQuery<Application> app = Application.findAll();
+		return app.stream();
 	}
 	
 	/**
@@ -26,7 +26,7 @@ public class ApplicationRessources {
 	@Transactional
 	public static void disableOneApp(Application tmpApp) {
 		PanacheQuery<Application> app = Application.find("id = ?1", tmpApp.id);
-		Application val = app.stream().findFirst().get();
+		Application val = app.stream().findFirst().orElseThrow();
 		val.setActive(false);
 		val.flush();
 	}

@@ -1,5 +1,6 @@
 package fr.umlv.square.database.entities;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 import javax.json.JsonObject;
 
 @Entity
+@Cacheable
 public class Log extends PanacheEntity {
 
 	@Column(name = "MESSAGE_LOG", nullable = false,length = 555)
