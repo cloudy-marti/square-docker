@@ -24,14 +24,14 @@ import static fr.umlv.square.docker.DockerDeploy.*;
 
 @ApplicationScoped
 @Path("/app")
-public class ApplicationsListRoute {
+public class ApplicationEndPoint {
 
 	private final ApplicationsList appList;
 	private final String port;
 	private final String host;
 
 	@Inject
-	public ApplicationsListRoute(@ConfigProperty(name = "quarkus.http.port") String port,
+	public ApplicationEndPoint(@ConfigProperty(name = "quarkus.http.port") String port,
 			@ConfigProperty(name = "quarkus.http.host") String host, ApplicationsList appList) {
 		this.host = host;
 		this.port = port;

@@ -31,7 +31,7 @@ import fr.umlv.square.models.LogsApplication;
 
 @Path("/logs")
 @SuppressWarnings("static-method")
-public class LogsListRoute {
+public class LogEndPoint {
 
 	@Inject
 	ApplicationsList listApp;

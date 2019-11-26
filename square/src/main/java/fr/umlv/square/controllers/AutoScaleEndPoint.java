@@ -21,15 +21,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static fr.umlv.square.controllers.ApplicationsListRoute.getFromJson;
+import static fr.umlv.square.controllers.ApplicationEndPoint.getFromJson;
 
 @Path("/auto-scale")
-public class AutoScaleListRoute {
+public class AutoScaleEndPoint {
 	private final ApplicationsList appList;
-	private final ApplicationsListRoute appListRoute;
+	private final ApplicationEndPoint appListRoute;
 
 	@Inject
-	public AutoScaleListRoute(ApplicationsList appList, ApplicationsListRoute appListRoute) {
+	public AutoScaleEndPoint(ApplicationsList appList, ApplicationEndPoint appListRoute) {
 		this.appList = appList;
 		this.appListRoute = appListRoute;
 	}
