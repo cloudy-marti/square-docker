@@ -11,7 +11,7 @@
 		<surefire-plugin.version>2.22.0</surefire-plugin.version>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
-		<quarkus.version>1.0.0.CR2</quarkus.version>
+		<quarkus.version>1.0.0.Final</quarkus.version>
 		<testcontainers.version>1.11.1</testcontainers.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -107,8 +107,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${compiler-plugin.version}</version>
-
 				<configuration>
+					<compilerArgument>-Xlint:all</compilerArgument>
 					<source>11</source>
 					<target>11</target>
 				</configuration>
