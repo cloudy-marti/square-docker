@@ -44,7 +44,7 @@ public class LogReader {
 		try {
 			proc = pb.start();
 		} catch (IOException e) {
-			throw new UndeclaredThrowableException(e);
+			throw new AssertionError(e);
 		}
 		InputStream inputStr = proc.getInputStream();
 		try (java.util.Scanner scan = new java.util.Scanner(inputStr)) {

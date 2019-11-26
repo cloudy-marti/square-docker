@@ -26,12 +26,12 @@ public class AppLifecycleBean {
 					lr.readStream(stream);
 				} catch (IOException e) {
 					if(!(e instanceof NoSuchFileException))
-						throw new UndeclaredThrowableException(e);	
+						throw new AssertionError(e);	
 				}
 				try {
 					Thread.sleep(15_000);
 				} catch (InterruptedException e) {
-					throw new UndeclaredThrowableException(e);
+					throw new AssertionError(e);
 				}
 			}
 		});
