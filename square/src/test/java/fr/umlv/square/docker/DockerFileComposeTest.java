@@ -1,5 +1,6 @@
 package fr.umlv.square.docker;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import fr.umlv.square.database.entities.Application;
@@ -12,20 +13,25 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.StringJoiner;
 
+import javax.inject.Inject;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DockerFileComposeTest {
+	
+	
+	
 
     @Test
     void dockerFileComposeWithNullAppShouldThrowNullPointerException () {
-        assertThrows(NullPointerException.class, () -> new DockerFileCompose(null, "", ""));
+        assertThrows(NullPointerException.class, () -> new DockerFileCompose(null, "", "", "../"));
     }
 
     @Test
     void assertDockerFileComposeGetsTheRightPath() throws IOException {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost");
+        DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost", "../");
         String tmp = "../docker-images/" + application.getAppname() + ".jvm";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
@@ -33,13 +39,14 @@ public class DockerFileComposeTest {
 
     @Test
     void assertDockerFileComposeCreatesADockerFile () throws IOException {
+
         Application application = new Application(1, "hello",8080, 8080, "docker");
 
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application,"8080", "localhost");
+        DockerFileCompose dockerFileCompose = new DockerFileCompose(application,"8080", "localhost", "../");
         dockerFileCompose.composeDockerFile();
 
-        Path path = Paths.get(dockerFileCompose.getDockerFilePath());
+        var path2 = Paths.get(dockerFileCompose.getDockerFilePath());
 
-        assertTrue(Files.exists(path));
+        assertTrue(Files.exists(path2));
     }
 }
