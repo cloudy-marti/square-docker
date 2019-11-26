@@ -17,6 +17,7 @@ import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.AutoScale;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -24,15 +25,6 @@ import static fr.umlv.square.controllers.ApplicationsListRoute.getFromJson;
 
 @Path("/auto-scale")
 public class AutoScaleListRoute {
-
-	private static final String actionTemplate;
-	private static final String noAction;
-
-	static {
-		actionTemplate = "need to %s %s instance(s)";
-		noAction = "no action";
-	}
-
 	private final ApplicationsList appList;
 	private final ApplicationsListRoute appListRoute;
 
@@ -41,10 +33,12 @@ public class AutoScaleListRoute {
 		this.appList = appList;
 		this.appListRoute = appListRoute;
 	}
+
 	private final AutoScale data = new AutoScale();
 
 	/**
 	 * Stop AutoScale manager.
+	 * 
 	 * @return Response
 	 */
 	@Transactional
@@ -52,15 +46,18 @@ public class AutoScaleListRoute {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response stop() {
-		if(!data.isAutoScaleRunning()) {
+		Map<String, Integer> map;
+		try {
+			map = this.data.WrapperStopAutoScale();
+		} catch (IllegalStateException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Non-running AutoScale cannot be stopped").build();
 		}
-		data.stopAutoScale();
-		return Response.status(200).entity(data.getAutoScale()).build();
+		return Response.status(Status.OK).entity(map).build();
 	}
 
 	/**
 	 * Get last AutoScale actions.
+	 * 
 	 * @return Response
 	 */
 	@Transactional
@@ -68,16 +65,18 @@ public class AutoScaleListRoute {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response status() {
-		if(!data.isAutoScaleRunning()) {
+		if (!data.isAutoScaleRunning()) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Cannot get non-running AutoScale status").build();
 		}
-		updateStatus();
-		return Response.status(200).entity(data.getStatusMap()).build();
+		var map = data.wrapperUpdateStatus(this.appList);
+		return Response.status(Status.OK).entity(map).build();
 	}
 
 	/**
 	 * Start or update AutoScale manager.
-	 * @param obj : JsonObject to be deserialized that contains the information of the apps and their instances wanted.
+	 * 
+	 * @param obj : JsonObject to be deserialized that contains the information of
+	 *            the apps and their instances wanted.
 	 * @return Response
 	 */
 	@Transactional
@@ -87,69 +86,34 @@ public class AutoScaleListRoute {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response update(JsonObject obj) {
 		Objects.requireNonNull(obj);
+		int status;
+		Map<String, String> map;
 		try {
-			obj.keySet().forEach(key -> {
-				String[] str = getFromJson(obj, key);
-				data.addToAutoScale(key, Integer.parseInt(str[0]));
-			});
-		} catch(NumberFormatException e) {
+			map = data.updateAutoScale(obj, this.appList);
+		} catch (NumberFormatException e) {
+			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+		} catch (IllegalArgumentException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
 		}
-
-		this.data.startAutoScale();
-		int status = updateStatus();
-
-		if(status == Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
-		} else if (status == Status.NOT_ACCEPTABLE.getStatusCode()) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
-		} else {
-			return Response.status(Status.OK).entity(data.getStatusMap()).build();
-		}
+		return Response.status(Status.OK).entity(map).build();
 	}
 
-	private int updateStatus() {
-		data.clearStatus();
-		int status = 200;
-		data.getAutoScale().forEach((key, autoScaleValue) -> {
-			long instances = appList.getCountByNameAndPort(key);
-			String statusValue =
-					instances == autoScaleValue ?
-					noAction : autoScaleActionString(instances - autoScaleValue);
-			data.addToStatus(key, statusValue);
-			try {
-				autoScaleAction(key, instances - autoScaleValue);
-			} catch (IOException e) {
-				return;
-			}
-		});
-		return status;
-	}
-
-	private String autoScaleActionString(long diff) {
-		if(diff < 0) { 			// "need to start <-diff> instances"
-			return String.format(actionTemplate, "start", -diff);
-		} else {				// "need to stop <diff> instances"
-			return String.format(actionTemplate, "stop", diff);
-		}
-	}
-
-	private void autoScaleAction(String app, long diff) throws IOException {
-		if(diff < 0) { 			// need to deploy <diff> instances
-			app.replace('"', ' ').trim();
-			String[] array = app.split(":");
-			for(int i = 0; i < -diff; ++i) {
-				appListRoute.deployApp(array);
-			}
-		} else {				// need to stop <diff> instances
-			for(int i = 0; i < diff; ++i) {
-				Optional<Application> tmpApp = appList.getAppByNameAndPort(app);
-				if(tmpApp.isEmpty()) {
-					return;
-				}
-				int id = tmpApp.get().getId();
-				appListRoute.stopApp(String.valueOf(id));
-			}
-		}
-	}
+//	private void autoScaleAction(String app, long diff) throws IOException {
+//		if (diff < 0) { // need to deploy <diff> instances
+//			app.replace('"', ' ').trim();
+//			String[] array = app.split(":");
+//			for (int i = 0; i < -diff; ++i) {
+//				appListRoute.deployingApp(array);
+//			}
+//		} else { // need to stop <diff> instances
+//			for (int i = 0; i < diff; ++i) {
+//				Optional<Application> tmpApp = appList.getAppByNameAndPort(app);
+//				if (tmpApp.isEmpty()) {
+//					return;
+//				}
+//				int id = tmpApp.get().getId();
+//				appListRoute.stoppingApp(String.valueOf(id));
+//			}
+//		}
+//	}
 }
