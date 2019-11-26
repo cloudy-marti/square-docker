@@ -92,7 +92,7 @@ public class ApplicationsList {
 		}
 	}
 
-	public long getCountByNameAndPort(String name) {
+	public int getCountByNameAndPort(String name) {
 		synchronized (this.lock) {
 			var c = this.deployCount.get(name);
 			return c != null ? c.getCurrentNumber() : 0;

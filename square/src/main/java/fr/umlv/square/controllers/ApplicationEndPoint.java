@@ -78,8 +78,9 @@ public class ApplicationEndPoint {
 		}
 	}
 	
-	public Response deployingApp(String[] array) throws IOException{
-		return this.deployApp(array);
+	@Transactional
+	public void deployingApp(String[] array) throws IOException{
+		this.deployApp(array);
 	}
 
 	private Response deployApp(String[] array) throws IOException {
@@ -119,8 +120,9 @@ public class ApplicationEndPoint {
 		}
 	}
 	
-	public Response stoppingApp(String idApp) throws IOException{
-		return this.stopApp(idApp);
+	@Transactional
+	public void stoppingApp(String idApp) throws IOException{
+		this.stopApp(idApp);
 	}
 
 	private Response stopApp(String idApp) throws IOException {

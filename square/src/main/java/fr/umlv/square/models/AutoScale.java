@@ -1,15 +1,21 @@
 package fr.umlv.square.models;
 
-import static fr.umlv.square.controllers.ApplicationsListRoute.getFromJson;
+import static fr.umlv.square.controllers.ApplicationEndPoint.getFromJson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
 
 import org.hibernate.annotations.Synchronize;
 
+import fr.umlv.square.database.entities.Application;
+
+@ApplicationScoped
 public class AutoScale {
 
 	private static final String actionTemplate;
@@ -31,9 +37,11 @@ public class AutoScale {
 	private boolean running;
 
 	private IsUpToDate isUp;
+	private boolean isFree;
 
 	public AutoScale() {
 		synchronized (this.lock) {
+			this.isFree = true;
 			this.isUp = IsUpToDate.FALSE;
 			this.autoScale = new HashMap<>();
 			this.statusMap = new HashMap<>();
@@ -127,7 +135,7 @@ public class AutoScale {
 
 	private int updateStatus(ApplicationsList appList) {
 		this.autoScale.forEach((key, autoScaleValue) -> {
-			long instances = appList.getCountByNameAndPort(key);
+			int instances = appList.getCountByNameAndPort(key);
 			String statusValue = instances == autoScaleValue ? noAction
 					: autoScaleActionString(instances - autoScaleValue);
 			this.addToStatus(key, statusValue);
@@ -135,7 +143,7 @@ public class AutoScale {
 		return 200;
 	}
 
-	private static String autoScaleActionString(long diff) {
+	private static String autoScaleActionString(int diff) {
 		if (diff < 0) { // "need to start <-diff> instances"
 			return String.format(actionTemplate, "start", -diff);
 		} else { // "need to stop <diff> instances"
@@ -149,4 +157,43 @@ public class AutoScale {
 			return this.autoScale;
 		}
 	}
+
+	public Map<String, Integer> tryUpdating(ApplicationsList list) {
+		synchronized (this.lock) {
+			var map = new HashMap<String, Integer>();
+			if(this.running) {
+				this.checkIsFree();
+				this.autoScale.forEach((key, autoScaleValue) -> {
+					int instances = list.getCountByNameAndPort(key);
+					map.put(key, instances - autoScaleValue);
+				});
+			}
+			return map;
+
+		}
+	}
+
+	private void checkIsFree() {
+		synchronized (this.lock) {
+			if(this.isFree) {
+				this.isFree = false;
+			}
+			else{
+				while(this.isFree = false) {
+					try {
+						this.lock.wait();
+					} catch (InterruptedException e) {
+						throw new AssertionError();
+					}
+				}
+			}
+		}
+	}
+	
+	public void isFree() {
+		synchronized (this.lock) {
+			this.isFree  = true;
+			this.lock.notifyAll();
+		}		
+	}	
 }

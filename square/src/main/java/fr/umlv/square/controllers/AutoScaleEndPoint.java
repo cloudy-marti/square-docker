@@ -27,14 +27,14 @@ import static fr.umlv.square.controllers.ApplicationEndPoint.getFromJson;
 public class AutoScaleEndPoint {
 	private final ApplicationsList appList;
 	private final ApplicationEndPoint appListRoute;
+	private final AutoScale data;
 
 	@Inject
-	public AutoScaleEndPoint(ApplicationsList appList, ApplicationEndPoint appListRoute) {
+	public AutoScaleEndPoint(ApplicationsList appList, ApplicationEndPoint appListRoute, AutoScale data) {
 		this.appList = appList;
 		this.appListRoute = appListRoute;
+		this.data = data;
 	}
-
-	private final AutoScale data = new AutoScale();
 
 	/**
 	 * Stop AutoScale manager.
@@ -98,22 +98,50 @@ public class AutoScaleEndPoint {
 		return Response.status(Status.OK).entity(map).build();
 	}
 
-//	private void autoScaleAction(String app, long diff) throws IOException {
-//		if (diff < 0) { // need to deploy <diff> instances
-//			app.replace('"', ' ').trim();
-//			String[] array = app.split(":");
-//			for (int i = 0; i < -diff; ++i) {
-//				appListRoute.deployingApp(array);
-//			}
-//		} else { // need to stop <diff> instances
-//			for (int i = 0; i < diff; ++i) {
-//				Optional<Application> tmpApp = appList.getAppByNameAndPort(app);
-//				if (tmpApp.isEmpty()) {
-//					return;
-//				}
-//				int id = tmpApp.get().getId();
-//				appListRoute.stoppingApp(String.valueOf(id));
-//			}
-//		}
-//	}
+	public void tryUpdating(ApplicationsList list) {
+		var map = this.data.tryUpdating(list);
+		new Thread(() -> {
+			int i = 0;
+			for (var elem : map.entrySet()) {
+				this.updateApps(elem.getKey(), elem.getValue(), map.size() == i);
+				i++;
+			}
+		}).start();
+
+	}
+
+	private void updateApps(String appName, int number, boolean isLast) {
+		String array[] = appName.split(":");
+		if (number < 0) {
+			for (int i = 0; i > number; i--) {
+				this.deployApp(array);
+			}
+		} else if (number > 0) {
+			for (int i = number; i > 0; i--)
+				this.removeApp(appName);
+		}
+		if (isLast)
+			this.data.isFree();
+	}
+
+	private void deployApp(String[] array) {
+		try {
+			this.appListRoute.deployingApp(array);
+		} catch (IOException e) {
+			return;
+		}
+	}
+
+	private void removeApp(String app) {
+		Optional<Application> tmpApp = this.appList.getAppByNameAndPort(app);
+		if (tmpApp.isEmpty()) {
+			return;
+		}
+		try {
+			System.out.println(String.valueOf(tmpApp.get().getId()));
+			this.appListRoute.stoppingApp(String.valueOf(tmpApp.get().getId()));
+		} catch (IOException e) {
+			return;
+		}
+	}
 }
