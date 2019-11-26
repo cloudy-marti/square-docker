@@ -94,7 +94,8 @@ public class ApplicationsList {
 
 	public long getCountByNameAndPort(String name) {
 		synchronized (this.lock) {
-			return this.list.stream().filter(app -> app.getApp().equals(name)).count();
+			var c = this.deployCount.get(name);
+			return c != null ? c.getCurrentNumber() : 0;
 		}
 	}
 
@@ -177,7 +178,7 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
-			ApplicationRessources.disableOneApp(tmpApp);
+			//ApplicationRessources.disableOneApp(tmpApp);
 			this.deployCount.get(tmpApp.getApp()).decCurrentNumber();
 		}
 	}
