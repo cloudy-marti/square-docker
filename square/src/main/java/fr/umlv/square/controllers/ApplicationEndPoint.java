@@ -29,13 +29,17 @@ public class ApplicationEndPoint {
 	private final ApplicationsList appList;
 	private final String port;
 	private final String host;
-
+	private final String path;
+	
 	@Inject
 	public ApplicationEndPoint(@ConfigProperty(name = "quarkus.http.port") String port,
-			@ConfigProperty(name = "quarkus.http.host") String host, ApplicationsList appList) {
+			@ConfigProperty(name = "quarkus.http.host") String host,
+		    @ConfigProperty(name = "docker.path.value") String path,
+		    ApplicationsList appList) {
 		this.host = host;
 		this.port = port;
 		this.appList = appList;
+		this.path = path;
 	}
 
 	/**
@@ -89,7 +93,7 @@ public class ApplicationEndPoint {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 		app = new Application(this.appList.getCount(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
 				array[0] + "-" + (this.appList.getDeployID(array[0],Integer.parseInt(array[1]))));
-		if (!deployDocker(app, this.port, this.host))
+		if (!deployDocker(app, this.port, this.host, this.path))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		this.appList.add(app, array[0]);
 		app.addInBDD();
@@ -132,7 +136,7 @@ public class ApplicationEndPoint {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
 		}
 		Application tmpApp = tmp.get();
-		if (!stopDockerInstance(tmpApp.getDockerInst())) {
+		if (!stopDockerInstance(tmpApp.getDockerInst(), this.path)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		this.appList.deleteApp(tmpApp);

@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import fr.umlv.square.database.entities.Application;
 
 public class DockerFileCompose {
@@ -17,6 +19,8 @@ public class DockerFileCompose {
     private String dockerFileBuffer;
     private String port;
     private String host;
+    
+
 
     static {
         dockerFileTemplate =
@@ -42,16 +46,12 @@ public class DockerFileCompose {
                 "\nCMD curl -f http://localhost:%s || exit 1";
     }
 
-    public DockerFileCompose(Application application, String port, String host) throws IOException {
+    public DockerFileCompose(Application application, String port, String host, String path) throws IOException {
         Objects.requireNonNull(application);
-
         this.application = application;
         this.port = port;
         this.host = host;
-
-        String path = System.getProperty("user.dir").contains("target") ? "../../" : "../";
         this.dockerFilePath = path + "docker-images/" + this.application.getAppname() + ".jvm";
-
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
 
