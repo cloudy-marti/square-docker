@@ -21,9 +21,6 @@ import java.util.stream.IntStream;
 
 public class DockerDeploy {
 
-    @Inject
-    private HashMap<String, String> appImage = new HashMap<>();
-
     private static Process createAndStartProcessBuilder(String[] cmdLine) throws IOException {
         Objects.requireNonNull(cmdLine);
         ProcessBuilder processBuilder = new ProcessBuilder(cmdLine);
@@ -73,7 +70,7 @@ public class DockerDeploy {
 
     public static boolean stopDockerInstance(String dockerInstance) throws IOException {
         Objects.requireNonNull(dockerInstance);
-        Process stopProcess = createAndStartProcessBuilder(String.format("docker container stop %s", dockerInstance).split(" "));
+        Process stopProcess = createAndStartProcessBuilder(String.format("docker container stop -t1 %s", dockerInstance).split(" "));
 
         try {
             stopProcess.waitFor();
