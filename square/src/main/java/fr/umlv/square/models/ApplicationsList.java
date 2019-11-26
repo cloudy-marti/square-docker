@@ -1,6 +1,5 @@
 package fr.umlv.square.models;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -10,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -121,7 +121,9 @@ public class ApplicationsList {
 	}
 
 	private void initApplicationsList() {
-		var listBDD_ = ApplicationRessources.getApplications().collect(Collectors.toList());
+		var list = ApplicationRessources.getApplications();
+		var listBDD_ = list.collect(Collectors.toList());
+		list.close();
 		if (listBDD_.size() != 0)
 			this.complexInit(listBDD_);
 		this.isUpToDate = IsUpToDate.TRUE;
@@ -174,11 +176,12 @@ public class ApplicationsList {
 		}
 	}
 
+	@Transactional
 	public void deleteApp(Application tmpApp) {
 		synchronized (this.lock) {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
-			//ApplicationRessources.disableOneApp(tmpApp);
+			ApplicationRessources.disableOneApp(tmpApp);
 			this.deployCount.get(tmpApp.getApp()).decCurrentNumber();
 		}
 	}
@@ -193,6 +196,12 @@ public class ApplicationsList {
 				}
 			}
 		}
+		
+	}
+
+	@Transactional
+	public void test() {
+		Application.streamAll().close();
 		
 	}
 }
