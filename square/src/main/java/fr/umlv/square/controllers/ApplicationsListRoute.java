@@ -77,8 +77,12 @@ public class ApplicationsListRoute {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
+	
+	public Response deployingApp(String[] array) throws IOException{
+		return this.deployApp(array);
+	}
 
-	public Response deployApp(String[] array) throws IOException {
+	private Response deployApp(String[] array) throws IOException {
 		Application app;
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
@@ -119,7 +123,7 @@ public class ApplicationsListRoute {
 		return this.stopApp(idApp);
 	}
 
-	public Response stopApp(String idApp) throws IOException {
+	private Response stopApp(String idApp) throws IOException {
 		Stop stopVal;
 		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
