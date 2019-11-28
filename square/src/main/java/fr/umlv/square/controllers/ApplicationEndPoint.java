@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import fr.umlv.square.models.Stop;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import fr.umlv.square.database.entities.Application;
+import fr.umlv.square.docker.SynchronizedDeploy;
 import fr.umlv.square.models.ApplicationsList;
 import static fr.umlv.square.docker.DockerDeploy.*;
 
@@ -30,12 +31,14 @@ public class ApplicationEndPoint {
 	private final String port;
 	private final String host;
 	private final String path;
+	private final SynchronizedDeploy deploy;
 	
 	@Inject
 	public ApplicationEndPoint(@ConfigProperty(name = "quarkus.http.port") String port,
 			@ConfigProperty(name = "quarkus.http.host") String host,
 		    @ConfigProperty(name = "docker.path.value") String path,
 		    ApplicationsList appList) {
+		this.deploy = new SynchronizedDeploy();
 		this.host = host;
 		this.port = port;
 		this.appList = appList;
@@ -78,6 +81,7 @@ public class ApplicationEndPoint {
 		} catch (IllegalStateException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Unbounded port not found").build();
 		} catch (IOException e) {
+			System.out.println(e);
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
@@ -93,7 +97,7 @@ public class ApplicationEndPoint {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 		app = new Application(this.appList.getCount(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
 				array[0] + "-" + (this.appList.getDeployID(array[0],Integer.parseInt(array[1]))));
-		if (!deployDocker(app, this.port, this.host, this.path))
+		if (!this.deploy.deployApp(app, this.port, this.host, this.path))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		this.appList.add(app, array[0]);
 		app.addInBDD();

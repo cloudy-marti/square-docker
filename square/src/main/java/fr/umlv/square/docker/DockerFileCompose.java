@@ -24,7 +24,7 @@ public class DockerFileCompose {
 
     static {
         dockerFileTemplate =
-                "FROM openjdk:11\n" +                                               // Base image giving openjdk 11 environment
+                "FROM openjdk:11.0.5-jre-slim\r\n" +                                 // Base image giving openjdk 11 environment
                 "EXPOSE %s\n" +                                                     // Docker port exposed to host
                 "WORKDIR /workspace/\n" +                                           // Workspace directory
 
@@ -51,7 +51,7 @@ public class DockerFileCompose {
         this.application = application;
         this.port = port;
         this.host = host;
-        this.dockerFilePath = path + "docker-images/" + this.application.getAppname() + ".jvm";
+        this.dockerFilePath = path + "docker-images/" + (this.application.getAppname()+this.application.getPort()) + ".jvm";
         this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
     }
 
