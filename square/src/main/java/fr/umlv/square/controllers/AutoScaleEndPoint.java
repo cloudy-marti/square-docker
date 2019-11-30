@@ -99,15 +99,15 @@ public class AutoScaleEndPoint {
 	}
 
 	public void tryUpdating() {
-		var map = this.data.tryUpdating();
 		new Thread(() -> {
+			var map = this.data.tryUpdating();
 			int i = 0;
 			for (var elem : map.entrySet()) {
 				this.updateApps(elem.getKey(), elem.getValue(), map.size() == i);
 				i++;
 			}
+			this.data.isFree();
 		}).start();
-
 	}
 
 	private void updateApps(String appName, int number, boolean isLast) {
@@ -120,8 +120,6 @@ public class AutoScaleEndPoint {
 			for (int i = number; i > 0; i--)
 				this.removeApp(appName);
 		}
-		if (isLast)
-			this.data.isFree();
 	}
 
 	private void deployApp(String[] array) {

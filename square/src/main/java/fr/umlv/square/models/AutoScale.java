@@ -122,11 +122,11 @@ public class AutoScale {
 
 	public Map<String, String> updateAutoScale(JsonObject obj, ApplicationsList appList) {
 		synchronized (this.lock) {
+			this.autoScale.clear();
 			if (!this.parseJsonToAddInMap(obj, appList.appAvailable()))
 				throw new IllegalArgumentException();
 			this.running = true;
 			this.clearStatus();
-			this.autoScale.clear();
 			this.updateStatus(appList);
 			return this.getStatusMap();
 		}
@@ -185,7 +185,7 @@ public class AutoScale {
 				this.isFree = false;
 			}
 			else{
-				while(this.isFree = false) {
+				while(this.isFree == false) {
 					try {
 						this.lock.wait();
 					} catch (InterruptedException e) {
