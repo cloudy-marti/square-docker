@@ -62,6 +62,7 @@ public class SynchronizedDeploy {
 	private static boolean buildDockerImage(Docker docker, String path, Application app) throws IOException {
 		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getBuildCmd());
 		if(waitFor(p)) {
+			DockerDeploy.rmDockerFile(app, path);
 			if(!saveImage(p, docker, path)) 
 				return false;
 			

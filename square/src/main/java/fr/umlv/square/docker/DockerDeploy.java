@@ -60,6 +60,22 @@ public class DockerDeploy {
 		return Arrays.asList(output.replace("'", "").split("\n"));
 	}
 
+	public static void rmDockerFile(Application app, String path){
+		var str = new StringBuilder();
+		var condition = System.getProperty("os.name").toLowerCase().startsWith("win"); 
+		if(condition) {
+			str.append("del");
+		}
+		else {
+			str.append("rm ");
+		}
+		str.append(app.getAppname()).append(app.getPort());
+		try {
+			createAndStartProcessBuilder(path,str.toString().split(" "));
+		} catch (IOException e) {
+			return;
+		}
+	}
 	public static int getUnboundedLocalPort() {
 		try (ServerSocket socket = new ServerSocket()) {
 			socket.bind(new InetSocketAddress(0));
