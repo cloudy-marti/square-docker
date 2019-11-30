@@ -1,15 +1,19 @@
 package fr.umlv.square.models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbTransient;
 
+import org.hibernate.mapping.Array;
+
 import fr.umlv.square.database.entities.Application;
-import fr.umlv.square.serializer.LogsApplicationSerializer;
 
 
 public class LogsApplication {
@@ -32,19 +36,25 @@ public class LogsApplication {
 	 * @return String which is the Json of the List.
 	 * @param List<LogsApplication> 
 	 */
-	public static String listToJson(List<LogsApplication>list){
-		StringBuilder str = new StringBuilder();
+	public static ArrayList<JsonObject> listToJson(List<LogsApplication>list){
+		ArrayList<JsonObject> array = new ArrayList<>(list.size());
 		for(var elem : list)
-			str.append(LogsApplication.serialize(elem));
-		return str.toString();
+			array.add(serialize(elem));
+		return array;
 
 	}
 	
-	private static String serialize(LogsApplication app) {
-		JsonbConfig config = new JsonbConfig()
-		        .withSerializers(new LogsApplicationSerializer());
-		Jsonb jsonb = JsonbBuilder.create(config);
-		return jsonb.toJson(app);
+	private static JsonObject serialize(LogsApplication obj) {
+		JsonObject value = 
+				Json.createObjectBuilder().
+				add("id", obj.app.getId()).
+		        add("app", obj.app.getApp()).
+		        add("port", obj.app.getPort()).
+		        add("service-port", obj.app.getServicePort()).
+		        add("message", obj.message).
+		        add("timestamp", obj.timestamp).
+		        build();
+		return value;
 	}
 
 	@JsonbTransient

@@ -4,9 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.Cacheable;
@@ -15,8 +14,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-
-import fr.umlv.square.serializer.ApplicationSerializer;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
@@ -49,9 +46,6 @@ public class Application extends PanacheEntity {
 
 	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL)
 	Set<Log> allLogs = new HashSet<Log>();
-
-	@Transient
-	private String elapsedTime;
 
 	/**
 	 * Default constructor for BDD
@@ -108,14 +102,6 @@ public class Application extends PanacheEntity {
 		return this.startTime;
 	}
 
-	public String getElapsedTime() {
-		return this.elapsedTime;
-	}
-
-	public void setElapsedTime(String value) {
-		this.elapsedTime = value;
-	}
-	
 	public boolean isActive() {
 		return this.isActive;
 	}
@@ -130,10 +116,16 @@ public class Application extends PanacheEntity {
 	 * @return String which correponds to the Json of the Application
 	 * @param Application
 	 */
-	public static String serialize(Application app) {
-		JsonbConfig config = new JsonbConfig().withSerializers(new ApplicationSerializer());
-		Jsonb jsonb = JsonbBuilder.create(config);
-		return jsonb.toJson(app);
+	public static JsonObject serialize(Application obj) {
+		JsonObject value = 
+				Json.createObjectBuilder().
+				add("id", obj.getId()).
+		        add("app", obj.getApp()).
+		        add("port", obj.getPort()).
+		        add("service-port", obj.getServicePort()).
+		        add("docker-instance", obj.getDockerInst()).
+		        build();
+		return value;
 	}
 
 	public void setIDContainer(String string) {

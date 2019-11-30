@@ -46,7 +46,8 @@ public class LogEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response getLogsByTime(@PathParam("time") int time) {
-		return Response.status(200).entity(LogsApplication.listToJson(LogRessources.getByTime(getTimed(time)))).build();
+		var res = LogRessources.getByTime(getTimed(time));
+		return Response.status(200).entity(LogsApplication.listToJson(res)).build();
 	}
 
 	
@@ -61,8 +62,9 @@ public class LogEndPoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLogsByTimeAndFilter(@PathParam("time") int time, @PathParam("filter") String filter) {
+		var res = LogRessources.getByTimeAndFilter(getTimed(time), filter);
 		return Response.status(200)
-				.entity(LogsApplication.listToJson(LogRessources.getByTimeAndFilter(getTimed(time), filter))).build();
+				.entity(LogsApplication.listToJson(res)).build();
 	}
 
 	/**

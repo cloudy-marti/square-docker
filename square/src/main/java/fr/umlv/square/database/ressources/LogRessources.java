@@ -4,12 +4,14 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.database.entities.Log;
 import fr.umlv.square.models.LogsApplication;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 public class LogRessources {
@@ -50,11 +52,11 @@ public class LogRessources {
 
 
 	private static ArrayList<LogsApplication> getData(String queryString, Object... params){
-		PanacheQuery<Log> query = Log.find(queryString,params);
-		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
-		query.stream().forEach(e -> {
+		List<Log> query = Log.list(queryString,params);
+		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>();
+		query.forEach(e -> {
 				array.add(new LogsApplication(e.getApp(), e.getMessage(),e.getTimeStamp().toString()));
-		});
+		});	
 		return array;
 	}
 	

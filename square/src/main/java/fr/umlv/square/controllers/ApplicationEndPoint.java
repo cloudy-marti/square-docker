@@ -53,12 +53,14 @@ public class ApplicationEndPoint {
 	@GET
 	@Transactional
 	@Produces(MediaType.APPLICATION_JSON)
-	public String list() {
+	public ArrayList<JsonObject> list() {
 		this.check_init();
-		StringBuilder str = new StringBuilder();
-		for (var elem : this.appList.getList())
-			str.append(Application.serialize(elem));
-		return str.toString();
+		var list = this.appList.getList();
+		ArrayList<JsonObject> str = new ArrayList<>(list.size());
+		for (int i = 0; i < list.size(); i++) {
+			str.add(Application.serialize(list.get(i))); 
+		}
+		return str;
 	}
 
 	/**
@@ -134,7 +136,6 @@ public class ApplicationEndPoint {
 	}
 
 	private Response stopApp(String idApp) throws IOException {
-		Stop stopVal;
 		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
@@ -145,7 +146,6 @@ public class ApplicationEndPoint {
 		}
 		this.appList.deleteApp(tmpApp);
 		String elapsedTime = getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis());
-		tmpApp.setElapsedTime(elapsedTime);
 		return Response.status(Status.OK).entity(Stop.serialize(new Stop(tmpApp, elapsedTime))).build();
 	}
 

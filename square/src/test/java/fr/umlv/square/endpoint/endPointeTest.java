@@ -31,42 +31,75 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalTo;
+
 @QuarkusTest
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class endPointeTest {
 
-//	@Test
-//	@Order(1)
-//	void testAppListEmpty() throws IOException {
-//		var app = get("/app/list").then().statusCode(HttpStatus.SC_OK)
-//				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract().body().asInputStream();
-//		assertEquals(0, app.available());
-//
-//	}
-//
-//	@Test
-//	@Order(2)
-//	void testDeployingApp() {
-//		var app = given().body("{\"app\" : \"todomvc:8080\"}")
-//				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-//				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
-//				.statusCode(HttpStatus.SC_CREATED).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-//				.extract().body().asInputStream();
-//	}
-//
-//	@Test
-//	@Order(3)
-//	void testStopApp() {
-//		var app = given().body("{\"id\" : \"1\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-//				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
-//				.statusCode(HttpStatus.SC_OK).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract()
-//				.body().asInputStream();
-//	}
-//
-//	private TypeRef<List<Application>> getAppTypeRef() {
-//		return new TypeRef<List<Application>>() {
-//		};
-//	}
+	@Test
+	@Order(1)
+	void testAppListEmpty() throws IOException {
+		var app = get("/app/list").then().statusCode(HttpStatus.SC_OK)
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract().body().asInputStream();
+		assertEquals(0, app.available());
 
+	}
+
+	@Test
+	@Order(2)
+	void testDeployingApp() {
+		given().body("{\"app\" : \"todomvc:8080\"}")
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
+				.statusCode(HttpStatus.SC_CREATED).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.body("id", is(Integer.valueOf(1)))
+				.body("app", is("todomvc:8080"))
+				.body("port", is(Integer.valueOf(8080)))
+				.body("docker-instance", is("todomvc-1"));
+	}
+	
+	@Test
+	@Order(2)
+	void testDeployingApp_2() {
+		given().body("{\"app\" : \"todomvc:8080\"}")
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
+				.statusCode(HttpStatus.SC_CREATED).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.body("id", is(Integer.valueOf(2)))
+				.body("app", is("todomvc:8080"))
+				.body("port", is(Integer.valueOf(8080)))
+				.body("docker-instance", is("todomvc-2"));
+	}
+	
+	@Test
+	@Order(3)
+	void testAppListWith2Deploy() throws IOException {
+		get("/app/list").then().statusCode(HttpStatus.SC_OK)
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.statusCode(HttpStatus.SC_OK)
+				.body("size()", is(1));
+
+	}
+
+
+	@Test
+	@Order(4)
+	void testStopApp() {
+		var app = given().body("{\"id\" : \"1\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
+				.statusCode(HttpStatus.SC_OK).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract()
+				.body().asInputStream();
+	}
+	
+	@Test
+	@Order(4)
+	void testStopApp2() {
+		var app = given().body("{\"id\" : \"2\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
+				.statusCode(HttpStatus.SC_OK).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract()
+				.body().asInputStream();
+	}
 }
