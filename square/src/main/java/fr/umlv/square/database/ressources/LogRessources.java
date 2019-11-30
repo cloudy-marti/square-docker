@@ -4,24 +4,34 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.database.entities.Log;
 import fr.umlv.square.models.LogsApplication;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import fr.umlv.square.repository.LogRepository;
 
+@ApplicationScoped
 public class LogRessources {
+	
+	
+	private final LogRepository repo;
+	
+	@Inject
+	public LogRessources(LogRepository rep) {
+		this.repo = rep;
+	}
+	
 	/**
 	 * This method get all the logs in the Databases after a specific date.
 	 * @return ArrayList<LogsApplication>
 	 * @param OffsetDateTime from which logs are retrieved
 	 */
 	@Transactional
-	public static ArrayList<LogsApplication> getByTime(OffsetDateTime time){
+	public ArrayList<LogsApplication> getByTime(OffsetDateTime time){
 		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
 		return getData(queryString, time);
 	}
@@ -35,7 +45,7 @@ public class LogRessources {
 	 * @param filter : String which is a filter
 	 * @throws IllegalArgumentException
 	 */
-	public static List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
+	public List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
 		int value;
 		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
 		if((value = isNumeric(filter)) > -1) 
@@ -51,8 +61,8 @@ public class LogRessources {
 	}
 
 
-	private static ArrayList<LogsApplication> getData(String queryString, Object... params){
-		List<Log> query = Log.list(queryString,params);
+	private ArrayList<LogsApplication> getData(String queryString, Object... params){
+		List<Log> query = this.repo.list(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>();
 		query.forEach(e -> {
 				array.add(new LogsApplication(e.getApp(), e.getMessage(),e.getTimeStamp().toString()));
@@ -61,21 +71,21 @@ public class LogRessources {
 	}
 	
 	
-	private static boolean isName(String filter) {
+	private boolean isName(String filter) {
 		var array = filter.split(":");
 		if(array.length != 2 || isNumeric(array[1])<=-1)
 			return false;
 		return true;
 	}
 	
-	private static boolean isInstance(String filter) {
+	private boolean isInstance(String filter) {
 		var array = filter.split("-");
 		if(array.length != 2 || isNumeric(array[1])<=-1)
 			return false;
 		return true;
 	}
 	
-	private static int isNumeric(String filter) {
+	private int isNumeric(String filter) {
 		try {
 			var value = Integer.parseInt(filter);
 			return value;
@@ -90,7 +100,7 @@ public class LogRessources {
 	 * @param List<Application>
 	 */
 	@Transactional
-	public static void disableApp(List<Application> appToDisable) {
+	public void disableApp(List<Application> appToDisable) {
 		appToDisable.forEach(e -> e.flush());			
 	}
 }

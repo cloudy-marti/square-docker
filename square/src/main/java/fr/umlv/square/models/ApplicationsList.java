@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -32,8 +33,15 @@ public class ApplicationsList {
 	private HashMap<String, Counter> deployCount = new HashMap<>();
 	private IsUpToDate isUpToDate;
 	private final Object lock = new Object();
+	
+	private final ApplicationRessources appRessource;
+	private final LogRessources logRessource;
 
-	public ApplicationsList(@ConfigProperty(name = "square.available.apps") String names) {
+	
+	@Inject
+	public ApplicationsList(@ConfigProperty(name = "square.available.apps") String names, ApplicationRessources app, LogRessources logR) {
+		this.appRessource = app;
+		this.logRessource = logR;
 		this.appAvailable.addAll(Arrays.asList(names.split(",")));
 	}
 
@@ -121,7 +129,7 @@ public class ApplicationsList {
 	}
 
 	private void initApplicationsList() {
-		var list = ApplicationRessources.getApplications();
+		var list = this.appRessource.getApplications();
 		var listBDD_ = list.collect(Collectors.toList());
 		list.close();
 		if (listBDD_.size() != 0)
@@ -160,7 +168,7 @@ public class ApplicationsList {
 			}
 			return false;
 		}).collect(Collectors.toList());
-		LogRessources.disableApp(appToDisable);	
+		this.logRessource.disableApp(appToDisable);	
 
 	}
 
@@ -181,7 +189,7 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			this.list.remove(tmpApp);
 			tmpApp.setActive(false);
-			ApplicationRessources.disableOneApp(tmpApp);
+			this.appRessource.disableOneApp(tmpApp);
 			this.deployCount.get(tmpApp.getApp()).decCurrentNumber();
 		}
 	}
@@ -196,12 +204,6 @@ public class ApplicationsList {
 				}
 			}
 		}
-		
-	}
-
-	@Transactional
-	public void test() {
-		Application.streamAll().close();
 		
 	}
 }

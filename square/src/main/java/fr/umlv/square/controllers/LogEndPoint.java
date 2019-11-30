@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -24,7 +25,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import fr.umlv.square.database.entities.Log;
+import fr.umlv.square.database.ressources.ApplicationRessources;
 import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
@@ -33,8 +37,16 @@ import fr.umlv.square.models.LogsApplication;
 @SuppressWarnings("static-method")
 public class LogEndPoint {
 
+	private final ApplicationsList listApp;
+	private final LogRessources logRessource;
+
+	
 	@Inject
-	ApplicationsList listApp;
+	public LogEndPoint(ApplicationsList app,  LogRessources logR) {
+		this.listApp = app;
+		this.logRessource = logR;
+	}
+
 
 	/**
 	 * This endPoint return logs filtered by a date.
@@ -46,7 +58,7 @@ public class LogEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
 	public Response getLogsByTime(@PathParam("time") int time) {
-		var res = LogRessources.getByTime(getTimed(time));
+		var res = this.logRessource.getByTime(getTimed(time));
 		return Response.status(200).entity(LogsApplication.listToJson(res)).build();
 	}
 
@@ -62,7 +74,7 @@ public class LogEndPoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLogsByTimeAndFilter(@PathParam("time") int time, @PathParam("filter") String filter) {
-		var res = LogRessources.getByTimeAndFilter(getTimed(time), filter);
+		var res = this.logRessource.getByTimeAndFilter(getTimed(time), filter);
 		return Response.status(200)
 				.entity(LogsApplication.listToJson(res)).build();
 	}

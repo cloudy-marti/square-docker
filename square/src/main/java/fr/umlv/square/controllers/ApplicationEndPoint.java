@@ -17,6 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import fr.umlv.square.models.Stop;
+import fr.umlv.square.utils.ShouldInitialize;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.docker.SynchronizedDeploy;
@@ -32,12 +34,11 @@ public class ApplicationEndPoint {
 	private final String host;
 	private final String path;
 	private final SynchronizedDeploy deploy;
-	
+
 	@Inject
 	public ApplicationEndPoint(@ConfigProperty(name = "quarkus.http.port") String port,
 			@ConfigProperty(name = "quarkus.http.host") String host,
-		    @ConfigProperty(name = "docker.path.value") String path,
-		    ApplicationsList appList) {
+			@ConfigProperty(name = "docker.path.value") String path, ApplicationsList appList) {
 		this.deploy = new SynchronizedDeploy();
 		this.host = host;
 		this.port = port;
@@ -47,6 +48,7 @@ public class ApplicationEndPoint {
 
 	/**
 	 * Gets a list of running containers, managed by Square, with a GET request.
+	 * 
 	 * @return Response
 	 */
 	@Path("/list")
@@ -58,14 +60,17 @@ public class ApplicationEndPoint {
 		var list = this.appList.getList();
 		ArrayList<JsonObject> str = new ArrayList<>(list.size());
 		for (int i = 0; i < list.size(); i++) {
-			str.add(Application.serialize(list.get(i))); 
+			str.add(Application.serialize(list.get(i)));
 		}
 		return str;
 	}
 
 	/**
-	 * Starts a container with the wanted application and port exposed by the container with a POST request.
-	 * @param obj : JsonObject to be deserialized and converted into an Application object.
+	 * Starts a container with the wanted application and port exposed by the
+	 * container with a POST request.
+	 * 
+	 * @param obj : JsonObject to be deserialized and converted into an Application
+	 *            object.
 	 * @return Response
 	 */
 	@Transactional
@@ -83,13 +88,12 @@ public class ApplicationEndPoint {
 		} catch (IllegalStateException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Unbounded port not found").build();
 		} catch (IOException e) {
-			System.out.println(e);
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
-	
+
 	@Transactional
-	public void deployingApp(String[] array) throws IOException{
+	public void deployingApp(String[] array) throws IOException {
 		this.deployApp(array);
 	}
 
@@ -98,7 +102,7 @@ public class ApplicationEndPoint {
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
 		app = new Application(this.appList.getCount(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
-				array[0] + "-" + (this.appList.getDeployID(array[0],Integer.parseInt(array[1]))));
+				array[0] + "-" + (this.appList.getDeployID(array[0], Integer.parseInt(array[1]))));
 		if (!this.deploy.deployApp(app, this.port, this.host, this.path))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		this.appList.add(app, array[0]);
@@ -108,6 +112,7 @@ public class ApplicationEndPoint {
 
 	/**
 	 * Stops a docker-container from its application's ID with a POST request.
+	 * 
 	 * @param obj : JsonObject to be deserialized
 	 * @return Response
 	 */
@@ -129,9 +134,9 @@ public class ApplicationEndPoint {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
-	
+
 	@Transactional
-	public void stoppingApp(String idApp) throws IOException{
+	public void stoppingApp(String idApp) throws IOException {
 		this.stopApp(idApp);
 	}
 

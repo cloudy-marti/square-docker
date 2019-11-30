@@ -138,7 +138,6 @@ public class AutoScaleEndPoint {
 			return;
 		}
 		try {
-			System.out.println(String.valueOf(tmpApp.get().getId()));
 			this.appListRoute.stoppingApp(String.valueOf(tmpApp.get().getId()));
 		} catch (IOException e) {
 			return;

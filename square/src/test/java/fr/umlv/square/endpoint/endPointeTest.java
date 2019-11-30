@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.jupiter.api.*;
 
 import javax.ws.rs.core.MediaType;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -35,21 +36,20 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalTo;
 
 @QuarkusTest
-@Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class endPointeTest {
 
 	@Test
 	@Order(1)
 	void testAppListEmpty() throws IOException {
-		var app = get("/app/list").then().statusCode(HttpStatus.SC_OK)
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).extract().body().asInputStream();
-		assertEquals(0, app.available());
-
+		get("/app/list").then().statusCode(HttpStatus.SC_OK)
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.body("size()", is(0));
 	}
 
 	@Test
 	@Order(2)
+	@ActivateRequestContext
 	void testDeployingApp() {
 		given().body("{\"app\" : \"todomvc:8080\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -62,7 +62,18 @@ public class endPointeTest {
 	}
 	
 	@Test
-	@Order(2)
+	@Order(3)
+	void testAppListWith1Deploy() throws IOException {
+		get("/app/list").then().statusCode(HttpStatus.SC_OK)
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.statusCode(HttpStatus.SC_OK)
+				.body("size()", is(1));
+
+	}
+	
+	@Test
+	@Order(4)
+	@ActivateRequestContext
 	void testDeployingApp_2() {
 		given().body("{\"app\" : \"todomvc:8080\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -75,18 +86,19 @@ public class endPointeTest {
 	}
 	
 	@Test
-	@Order(3)
+	@Order(5)
 	void testAppListWith2Deploy() throws IOException {
 		get("/app/list").then().statusCode(HttpStatus.SC_OK)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.statusCode(HttpStatus.SC_OK)
-				.body("size()", is(1));
+				.body("size()", is(2));
 
 	}
 
 
 	@Test
-	@Order(4)
+	@Order(6)
+	@ActivateRequestContext
 	void testStopApp() {
 		var app = given().body("{\"id\" : \"1\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
@@ -94,8 +106,11 @@ public class endPointeTest {
 				.body().asInputStream();
 	}
 	
+	
+	
 	@Test
-	@Order(4)
+	@Order(7)
+	@ActivateRequestContext
 	void testStopApp2() {
 		var app = given().body("{\"id\" : \"2\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
