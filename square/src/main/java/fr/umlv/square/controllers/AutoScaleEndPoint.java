@@ -98,8 +98,8 @@ public class AutoScaleEndPoint {
 		return Response.status(Status.OK).entity(map).build();
 	}
 
-	public void tryUpdating(ApplicationsList list) {
-		var map = this.data.tryUpdating(list);
+	public void tryUpdating() {
+		var map = this.data.tryUpdating();
 		new Thread(() -> {
 			int i = 0;
 			for (var elem : map.entrySet()) {

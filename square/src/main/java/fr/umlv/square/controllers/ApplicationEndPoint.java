@@ -17,8 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import fr.umlv.square.models.Stop;
-import fr.umlv.square.utils.ShouldInitialize;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.docker.SynchronizedDeploy;

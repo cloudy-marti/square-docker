@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.JsonObject;
 
 import org.hibernate.annotations.Synchronize;
@@ -30,6 +31,8 @@ public class AutoScale {
 		noAction = "no action";
 	}
 
+	private final ApplicationsList appList;
+
 	private final Map<String, Integer> autoScale;
 	private final Map<String, String> statusMap;
 
@@ -39,8 +42,10 @@ public class AutoScale {
 	private IsUpToDate isUp;
 	private boolean isFree;
 
-	public AutoScale() {
+	@Inject
+	public AutoScale(ApplicationsList appList) {
 		synchronized (this.lock) {
+			this.appList = appList;
 			this.isFree = true;
 			this.isUp = IsUpToDate.FALSE;
 			this.autoScale = new HashMap<>();
@@ -121,6 +126,7 @@ public class AutoScale {
 				throw new IllegalArgumentException();
 			this.running = true;
 			this.clearStatus();
+			this.autoScale.clear();
 			this.updateStatus(appList);
 			return this.getStatusMap();
 		}
@@ -158,13 +164,13 @@ public class AutoScale {
 		}
 	}
 
-	public Map<String, Integer> tryUpdating(ApplicationsList list) {
+	public Map<String, Integer> tryUpdating() {
 		synchronized (this.lock) {
 			var map = new HashMap<String, Integer>();
 			if(this.running) {
 				this.checkIsFree();
 				this.autoScale.forEach((key, autoScaleValue) -> {
-					int instances = list.getCountByNameAndPort(key);
+					int instances = this.appList.getCountByNameAndPort(key);
 					map.put(key, instances - autoScaleValue);
 				});
 			}

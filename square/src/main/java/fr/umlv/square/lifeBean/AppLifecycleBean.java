@@ -37,7 +37,7 @@ public class AppLifecycleBean {
 					if (!list.contains(e.getDockerInst()))
 						this.app.deleteApp(e);
 				});
-				this.autoScale.tryUpdating(this.app);
+				this.autoScale.tryUpdating();
 			}
 		}).start();
 	}
