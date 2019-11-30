@@ -49,7 +49,6 @@ public class endPointeTest {
 
 	@Test
 	@Order(2)
-	@ActivateRequestContext
 	void testDeployingApp() {
 		given().body("{\"app\" : \"todomvc:8080\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -59,6 +58,24 @@ public class endPointeTest {
 				.body("app", is("todomvc:8080"))
 				.body("port", is(Integer.valueOf(8080)))
 				.body("docker-instance", is("todomvc-1"));
+	}
+	
+	@Test
+	void testDeployingBadApp() {
+		given().body("{\"app\" : \"todo:8080\"}")
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
+				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+
+	}
+	
+	@Test
+	void testDeployingAppWithoutPort() {
+		given().body("{\"app\" : \"todo:\"}")
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
+				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+
 	}
 	
 	@Test
@@ -73,7 +90,6 @@ public class endPointeTest {
 	
 	@Test
 	@Order(4)
-	@ActivateRequestContext
 	void testDeployingApp_2() {
 		given().body("{\"app\" : \"todomvc:8080\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -98,7 +114,6 @@ public class endPointeTest {
 
 	@Test
 	@Order(6)
-	@ActivateRequestContext
 	void testStopApp() {
 		var app = given().body("{\"id\" : \"1\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
@@ -106,11 +121,15 @@ public class endPointeTest {
 				.body().asInputStream();
 	}
 	
-	
+	@Test
+	void testStopAppBadId() {
+		var app = given().body("{\"id\" : \"10\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
+				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+	}	
 	
 	@Test
 	@Order(7)
-	@ActivateRequestContext
 	void testStopApp2() {
 		var app = given().body("{\"id\" : \"2\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
