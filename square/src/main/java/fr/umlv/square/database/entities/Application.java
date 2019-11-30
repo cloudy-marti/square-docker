@@ -53,6 +53,9 @@ public class Application extends PanacheEntity {
 	@Transient
 	private String elapsedTime;
 
+	/**
+	 * Default constructor for BDD
+	 */
 	public Application() {
 	}
 

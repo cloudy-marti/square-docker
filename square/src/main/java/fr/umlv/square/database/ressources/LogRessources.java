@@ -53,7 +53,7 @@ public class LogRessources {
 		PanacheQuery<Log> query = Log.find(queryString,params);
 		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>(Math.toIntExact(query.count()));
 		query.stream().forEach(e -> {
-				array.add(new LogsApplication(e.getApp(), e.message,e.timestamp.toString()));
+				array.add(new LogsApplication(e.getApp(), e.getMessage(),e.getTimeStamp().toString()));
 		});
 		return array;
 	}

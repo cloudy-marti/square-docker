@@ -21,10 +21,10 @@ import javax.json.JsonObject;
 public class Log extends PanacheEntity {
 
 	@Column(name = "MESSAGE_LOG", nullable = false,length = 555)
-	public String message;
+	private String message;
 	
 	@Column(name = "TIMESTAMP_LOG", nullable = false)
-	public OffsetDateTime timestamp;
+	private OffsetDateTime timestamp;
 	
     @ManyToOne
     @JoinColumn(name ="FK_APPLICATION")
@@ -39,6 +39,9 @@ public class Log extends PanacheEntity {
 		this.app = app;
 	}
 	
+	/**
+	 * Default constructor for BDD
+	 */
 	public Log() {}
 	
 
@@ -85,6 +88,14 @@ public class Log extends PanacheEntity {
 
 	public Application getApp() {
 		return this.app;
+	}
+
+	public String getMessage() {
+		return this.message;
+	}
+
+	public OffsetDateTime getTimeStamp() {
+		return this.timestamp;
 	}
 
 }
