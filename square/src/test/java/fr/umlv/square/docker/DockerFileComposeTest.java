@@ -32,21 +32,8 @@ public class DockerFileComposeTest {
         Application application = new Application(1, "hello", 8080, 8080, "docker");
 
         DockerFileCompose dockerFileCompose = new DockerFileCompose(application, "8080", "localhost", "../");
-        String tmp = "../docker-images/" + application.getAppname() + application.getPort() +".jvm";
+        String tmp = "../docker-images/";
 
         assertEquals(tmp, dockerFileCompose.getDockerFilePath());
-    }
-
-    @Test
-    void assertDockerFileComposeCreatesADockerFile () throws IOException {
-
-        Application application = new Application(1, "hello",8080, 8080, "docker");
-
-        DockerFileCompose dockerFileCompose = new DockerFileCompose(application,"8080", "localhost", "../");
-        dockerFileCompose.composeDockerFile();
-
-        var path2 = Paths.get(dockerFileCompose.getDockerFilePath());
-
-        assertTrue(Files.exists(path2));
     }
 }

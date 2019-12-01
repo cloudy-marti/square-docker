@@ -2,19 +2,14 @@ package fr.umlv.square.models;
 
 import static fr.umlv.square.controllers.ApplicationEndPoint.getFromJson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
 
-import org.hibernate.annotations.Synchronize;
-
-import fr.umlv.square.database.entities.Application;
 
 @ApplicationScoped
 public class AutoScale {
@@ -38,8 +33,6 @@ public class AutoScale {
 
 	private final Object lock = new Object();
 	private boolean running;
-
-	private IsUpToDate isUp;
 	private boolean isFree;
 
 	@Inject
@@ -47,7 +40,6 @@ public class AutoScale {
 		synchronized (this.lock) {
 			this.appList = appList;
 			this.isFree = true;
-			this.isUp = IsUpToDate.FALSE;
 			this.autoScale = new HashMap<>();
 			this.statusMap = new HashMap<>();
 		}

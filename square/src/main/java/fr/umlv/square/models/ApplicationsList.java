@@ -259,7 +259,9 @@ public class ApplicationsList {
 
 	public int getCountAndInc() {
 		synchronized (this.lock) {
-			return this.idApps.inc().getCount();
+			var value = this.idApps.getCount();
+			this.idApps.inc();
+			return value;
 		}
 	}
 }

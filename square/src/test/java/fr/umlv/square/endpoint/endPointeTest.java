@@ -65,7 +65,7 @@ public class endPointeTest {
 		given().body("{\"app\" : \"todo:8080\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
-				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+				.statusCode(400).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
 	}
 	
@@ -74,7 +74,7 @@ public class endPointeTest {
 		given().body("{\"app\" : \"todo:\"}")
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/deploy").then()
-				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+				.statusCode(400).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
 	}
 	
@@ -125,7 +125,7 @@ public class endPointeTest {
 	void testStopAppBadId() {
 		var app = given().body("{\"id\" : \"10\"}").header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).when().post("/app/stop").then()
-				.statusCode(406).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+				.statusCode(400).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 	}	
 	
 	@Test

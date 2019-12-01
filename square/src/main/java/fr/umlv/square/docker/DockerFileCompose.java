@@ -1,11 +1,10 @@
 package fr.umlv.square.docker;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import fr.umlv.square.database.entities.Application;
 
 public class DockerFileCompose {
@@ -13,12 +12,11 @@ public class DockerFileCompose {
     private static final String dockerFileTemplate;
 
     private final Application application;
-
     private final String dockerFilePath;
-    private final FileWriter dockerFileBufferedWriter;
+    private final String dockerFileName;
     private String dockerFileBuffer;
-    private String port;
-    private String host;
+    private final String port;
+    private final String host;
     
 
 
@@ -51,8 +49,8 @@ public class DockerFileCompose {
         this.application = application;
         this.port = port;
         this.host = host;
-        this.dockerFilePath = path + "docker-images/" + (this.application.getAppname()+this.application.getPort()) + ".jvm";
-        this.dockerFileBufferedWriter = new FileWriter(this.dockerFilePath);
+        this.dockerFilePath = path + "docker-images/";
+        this.dockerFileName = (this.application.getAppname()+this.application.getPort()) + ".jvm";
     }
 
     public String getDockerFilePath() {
@@ -61,22 +59,26 @@ public class DockerFileCompose {
 
     private void composeDockerFileBuffer() {
         this.dockerFileBuffer = String.format(dockerFileTemplate,
-                application.getPort(),
+        		this.application.getPort(),
                 this.port,
                 this.host,
-                application.getAppname(),
-                application.getAppname(),
-                application.getAppname(),
-                application.getPort(),
-                application.getAppname(),
-                application.getPort()
+                this.application.getAppname(),
+                this.application.getAppname(),
+                this.application.getAppname(),
+                this.application.getPort(),
+                this.application.getAppname(),
+                this.application.getPort()
                 );
     }
 
+    /**
+     * This method create a file corresponding to the DockerFile created
+     * @throws IOException
+     */
     public void composeDockerFile() throws IOException {
         composeDockerFileBuffer();
-        dockerFileBufferedWriter.write(dockerFileBuffer);
-        dockerFileBufferedWriter.flush();
-        dockerFileBufferedWriter.close();
+        Path fileToCreatePath = Paths.get(this.dockerFilePath + this.dockerFileName);
+        Path newFilePath = Files.createFile(fileToCreatePath);
+        Files.write(newFilePath, this.dockerFileBuffer.getBytes());
     }
 }

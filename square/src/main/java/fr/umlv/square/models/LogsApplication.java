@@ -6,12 +6,7 @@ import java.util.Objects;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbTransient;
-
-import org.hibernate.mapping.Array;
 
 import fr.umlv.square.database.entities.Application;
 
