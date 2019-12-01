@@ -18,7 +18,7 @@ import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.database.ressources.ApplicationRessources;
 import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.docker.DockerDeploy;
-import fr.umlv.square.utils.Counter;
+import fr.umlv.square.utils.SynchronizedCounter;
 
 @ApplicationScoped
 public class ApplicationsList {
@@ -29,26 +29,35 @@ public class ApplicationsList {
 	private final ArrayList<Application> list = new ArrayList<>();
 
 	private final ArrayList<String> appAvailable = new ArrayList<>();
-	private final Counter idApps = new Counter(1);
-	private HashMap<String, Counter> deployCount = new HashMap<>();
+	private final SynchronizedCounter idApps = new SynchronizedCounter(1);
+	private HashMap<String, SynchronizedCounter> deployCount = new HashMap<>();
 	private IsUpToDate isUpToDate;
 	private final Object lock = new Object();
 	
 	private final ApplicationRessources appRessource;
 	private final LogRessources logRessource;
 
-	
+	/**
+	 * Constructor
+	 * @param names get value from application.properties which is a string of the available apps
+	 * @param app injected ApplicationRessources 
+	 * @param logR injected LogRessources
+	 */
 	@Inject
 	public ApplicationsList(@ConfigProperty(name = "square.available.apps") String names, ApplicationRessources app, LogRessources logR) {
 		this.appRessource = app;
 		this.logRessource = logR;
 		this.appAvailable.addAll(Arrays.asList(names.split(",")));
 	}
-
-	public void add(Application a, String str) {
+	
+	/**
+	 * this method add the app in the list and also increment the Counter.
+	 * @param app to be added
+	 */
+	public void add(Application app) {
 		synchronized (this.lock) {
-			this.list.add(a);
-			this.deployCount.get(a.getApp()).incCurrentNumber();
+			this.list.add(app);
+			this.deployCount.get(app.getApp()).incCurrentNumber();
 		}
 	}
 
@@ -58,6 +67,12 @@ public class ApplicationsList {
 		}
 	}
 
+
+	/**
+	 * 
+	 * @param dockerInstance, the docker instance name of the app
+	 * @return an Optional<Applicaton>
+	 */
 	public Optional<Application> getOneAppRunning(String dockerInstance) {
 		synchronized (this.lock) {
 			Optional<Application> op = this.list.stream().filter(e -> dockerInstance.equals(e.getDockerInst()))
@@ -66,6 +81,11 @@ public class ApplicationsList {
 		}
 	}
 
+	/**
+	 * 
+	 * @param id of the app
+	 * @return an Optional<Applicaton>
+	 */
 	public Optional<Application> getOneAppRunningByID(String id) {
 		synchronized (this.lock) {
 			return this.list.stream().filter(e -> e.matchesWithID(id)).findFirst();
@@ -76,9 +96,15 @@ public class ApplicationsList {
 		return this.appAvailable;
 	}
 
+	/**
+	 * This methods returns the ID of the container depending on the name of the app and her port
+	 * @param appName
+	 * @param port
+	 * @return the id that the app will have
+	 */
 	public int getDeployID(String appName, int port) {
 		synchronized (this.lock) {
-			this.deployCount.compute(appName + ":" + port, (key, value) -> value == null ? new Counter(1) : value.inc());
+			this.deployCount.compute(appName + ":" + port, (key, value) -> value == null ? new SynchronizedCounter(1) : value.inc());
 			int res = 0;
 			for(var key : this.deployCount.keySet()) {
 				res += key.split(":")[0].equals(appName) ? this.deployCount.get(key).getCount() : 0; 
@@ -87,18 +113,33 @@ public class ApplicationsList {
 		}
 	}
 
+	/**
+	 * 
+	 * @param id of the app
+	 * @return an Optional<Application> to describe that we don't know if the app is present
+	 */
 	public Optional<Application> getAppById(int id) {
 		synchronized (this.lock) {
 			return this.list.stream().filter(app -> app.getId() == id).findFirst();
 		}
 	}
 
+	/**
+	 * 
+	 * @param name of the app
+	 * @return an Optional<Application> to describe that we don't know if the app is present
+	 */
 	public Optional<Application> getAppByNameAndPort(String name) {
 		synchronized (this.lock) {
 			return this.list.stream().filter(app -> app.getApp().equals(name)).findFirst();
 		}
 	}
 
+	/**
+	 * 
+	 * @param name of the app
+	 * @return the total of application deployed with this name
+	 */
 	public int getCountByNameAndPort(String name) {
 		synchronized (this.lock) {
 			var c = this.deployCount.get(name);
@@ -112,6 +153,9 @@ public class ApplicationsList {
 		}
 	}
 
+	/**
+	 * A wrapper to init all fields from the dataBase
+	 */
 	public void wrapperInit() {
 		synchronized (this.lock) {
 			while (IsUpToDate.IN_PROGRESS == this.isUpToDate)
@@ -128,11 +172,11 @@ public class ApplicationsList {
 	}
 
 	private void initApplicationsList() {
-		var list = this.appRessource.getApplications();
-		var listBDD_ = list.collect(Collectors.toList());
-		list.close();
-		if (listBDD_.size() != 0)
-			this.complexInit(listBDD_);
+		try(var list = this.appRessource.getApplications();){
+			var listBDD_ = list.collect(Collectors.toList());
+			if (listBDD_.size() != 0)
+				this.complexInit(listBDD_);
+		}
 		this.isUpToDate = IsUpToDate.TRUE;
 		this.lock.notifyAll();
 
@@ -178,11 +222,15 @@ public class ApplicationsList {
 			var elem = copy.get(0);
 			tmp = copy.stream().filter(e -> e.getApp().equals(elem.getApp())).collect(Collectors.toList());
 			int size = tmp.size();
-			this.deployCount.compute(elem.getApp(), (key, value) -> new Counter(size));
+			this.deployCount.compute(elem.getApp(), (key, value) -> new SynchronizedCounter(size));
 			copy.removeAll(tmp);
 		}
 	}
 
+	/**
+	 * Delete an application
+	 * @param tmpApp the application to be deleted
+	 */
 	@Transactional
 	public void deleteApp(Application tmpApp) {
 		synchronized (this.lock) {
@@ -193,6 +241,9 @@ public class ApplicationsList {
 		}
 	}
 
+	/**
+	 * put to sleep the thread while the initialisation of all fields are done
+	 */
 	public void waitStillInit() {
 		synchronized (this.lock) {
 			while(this.isUpToDate != IsUpToDate.TRUE) {

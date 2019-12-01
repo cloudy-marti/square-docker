@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -24,23 +23,22 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import fr.umlv.square.database.entities.Log;
-import fr.umlv.square.database.ressources.ApplicationRessources;
 import fr.umlv.square.database.ressources.LogRessources;
 import fr.umlv.square.models.ApplicationsList;
 import fr.umlv.square.models.LogsApplication;
 
 @Path("/logs")
-@SuppressWarnings("static-method")
 public class LogEndPoint {
 
 	private final ApplicationsList listApp;
 	private final LogRessources logRessource;
 
-	
+	/**
+	 * 
+	 * @param app Injected value of ApplicationList
+	 * @param logR Injected value of LogRessources
+	 */
 	@Inject
 	public LogEndPoint(ApplicationsList app,  LogRessources logR) {
 		this.listApp = app;

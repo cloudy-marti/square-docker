@@ -16,7 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import fr.umlv.square.models.Stop;
+import fr.umlv.square.models.ApplicationStop;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.docker.SynchronizedDeploy;
@@ -33,6 +33,13 @@ public class ApplicationEndPoint {
 	private final String path;
 	private final SynchronizedDeploy deploy;
 
+	/**
+	 * Constructor
+	 * @param port get value from application.properties
+	 * @param host get value from application.properties
+	 * @param path get value from application.properties
+	 * @param appList get the inject value of applicationsList
+	 */
 	@Inject
 	public ApplicationEndPoint(@ConfigProperty(name = "quarkus.http.port") String port,
 			@ConfigProperty(name = "quarkus.http.host") String host,
@@ -89,7 +96,12 @@ public class ApplicationEndPoint {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
 	}
-
+	
+	/**
+	 * Wrapper to deploy an app from the auto-scale
+	 * @param array which contains port and name of app
+	 * @throws IOException
+	 */
 	@Transactional
 	public void deployingApp(String[] array) throws IOException {
 		this.deployApp(array);
@@ -98,12 +110,12 @@ public class ApplicationEndPoint {
 	private Response deployApp(String[] array) throws IOException {
 		Application app;
 		if (!this.appList.appAvailable().contains(array[0]))
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
+			return Response.status(Status.BAD_REQUEST).entity("Application doesn't exists").build();
 		app = new Application(this.appList.getCountAndInc(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
 				array[0] + "-" + (this.appList.getDeployID(array[0], Integer.parseInt(array[1]))));
 		if (!this.deploy.deployApp(app, this.port, this.host, this.path))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		this.appList.add(app, array[0]);
+		this.appList.add(app);
 		app.addInBDD();
 		return Response.status(Status.CREATED).entity(Application.serialize(app)).build();
 	}
@@ -133,13 +145,18 @@ public class ApplicationEndPoint {
 		}
 	}
 
+	/**
+	 * Wrapper to stop an application from the auto-scale
+	 * @param idApp
+	 * @throws IOException
+	 */
 	@Transactional
 	public void stoppingApp(String idApp) throws IOException {
 		this.stopApp(idApp);
 	}
 
 	private Response stopApp(String idApp) throws IOException {
-		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
+		Optional<Application> tmp = this.appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
 			return Response.status(Status.BAD_REQUEST).entity("Container is no longer listed").build();
 		}
@@ -149,9 +166,15 @@ public class ApplicationEndPoint {
 		}
 		this.appList.deleteApp(tmpApp);
 		String elapsedTime = getElapsedTime(tmpApp.getStartTime(), System.currentTimeMillis());
-		return Response.status(Status.OK).entity(Stop.serialize(new Stop(tmpApp, elapsedTime))).build();
+		return Response.status(Status.OK).entity(ApplicationStop.serialize(new ApplicationStop(tmpApp, elapsedTime))).build();
 	}
 
+	/**
+	 * this method return an array of string get from a JsonObject.
+	 * @param obj
+	 * @param key
+	 * @return array of string
+	 */
 	public static String[] getFromJson(JsonObject obj, String key) {
 		String str = obj.get(key).toString();
 		str = str.replace('"', ' ').trim();

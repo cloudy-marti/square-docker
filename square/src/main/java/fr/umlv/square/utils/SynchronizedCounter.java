@@ -2,22 +2,30 @@ package fr.umlv.square.utils;
 
 import javax.enterprise.context.ApplicationScoped;
 
+/**
+ * This class in a threadSafe counter.
+ * It counts two things : 
+ * 	- current number 
+ *  - total incrementation 
+ * @author FAU
+ *
+ */
 @ApplicationScoped
-public class Counter {
+public class SynchronizedCounter {
 	private int count;
 	private int currentNumber;
 	private final Object lock = new Object();
 	
-	public Counter(int count) {
+	public SynchronizedCounter(int count) {
 		synchronized (this.lock) {
 			this.count = count;
 		}
 	}
 	
 	
-	public Counter(){}
+	public SynchronizedCounter(){}
 
-	public Counter inc() {
+	public SynchronizedCounter inc() {
 		synchronized (this.lock) {
 			this.count++;
 			return this;

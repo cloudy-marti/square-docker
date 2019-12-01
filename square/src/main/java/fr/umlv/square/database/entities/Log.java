@@ -56,14 +56,9 @@ public class Log extends PanacheEntity {
 		for(JsonObject elem : obj) {
 			String message = String.valueOf(elem.get("message")); //$NON-NLS-1$
 			String defaultDate = elem.get("date").toString().replace('"',' ').trim(); //$NON-NLS-1$
-			message = message.substring(1, message.lastIndexOf("\"")); //$NON-NLS-1$
-			
+			message = message.substring(1, message.lastIndexOf("\"")); //$NON-NLS-1$	
 			OffsetDateTime date = getDateOrDefault(message, defaultDate);
-			l.add(new Log(
-					message,
-					date, 
-					app
-				));
+			l.add(new Log(message,date,app));
 		}
 		Log.persist(l.stream());
 		return true;

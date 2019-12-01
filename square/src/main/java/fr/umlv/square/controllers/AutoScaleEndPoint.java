@@ -21,14 +21,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static fr.umlv.square.controllers.ApplicationEndPoint.getFromJson;
-
 @Path("/auto-scale")
 public class AutoScaleEndPoint {
 	private final ApplicationsList appList;
 	private final ApplicationEndPoint appListRoute;
 	private final AutoScale data;
 
+	/**
+	 * Constructor
+	 * @param appList  get the inject value of ApplicationList
+	 * @param appListRoute  get the inject value of ApplicationEndPoint
+	 * @param data  get the inject value of AutoScale
+	 */
 	@Inject
 	public AutoScaleEndPoint(ApplicationsList appList, ApplicationEndPoint appListRoute, AutoScale data) {
 		this.appList = appList;
@@ -65,10 +69,10 @@ public class AutoScaleEndPoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response status() {
-		if (!data.isAutoScaleRunning()) {
+		if (!this.data.isAutoScaleRunning()) {
 			return Response.status(Status.BAD_REQUEST).entity("Cannot get non-running AutoScale status").build();
 		}
-		var map = data.wrapperUpdateStatus(this.appList);
+		var map = this.data.wrapperUpdateStatus(this.appList);
 		return Response.status(Status.OK).entity(map).build();
 	}
 
@@ -86,10 +90,9 @@ public class AutoScaleEndPoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response update(JsonObject obj) {
 		Objects.requireNonNull(obj);
-		int status;
 		Map<String, String> map;
 		try {
-			map = data.updateAutoScale(obj, this.appList);
+			map = this.data.updateAutoScale(obj, this.appList);
 		} catch (NumberFormatException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Error with the JSON").build();
 		} catch (IllegalArgumentException e) {
@@ -98,6 +101,9 @@ public class AutoScaleEndPoint {
 		return Response.status(Status.OK).entity(map).build();
 	}
 
+	/**
+	 * This method create a Thread who will apply the setup of the auto-scale
+	 */
 	public void tryUpdating() {
 		new Thread(() -> {
 			var map = this.data.tryUpdating();
