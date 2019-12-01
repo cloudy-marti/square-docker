@@ -8,7 +8,8 @@ import fr.umlv.square.database.entities.Application;
 public class Docker {
 
     private static final String buildCmdTemplate;
-    private static final String runCmdTemplate;	
+    private static final String runCmdTemplateFromName;	
+    private static final String runCmdTemplateFromID;	
     private static final String saveCmdTemplate;
     private static final String loadCmdTemplate;
 
@@ -16,7 +17,8 @@ public class Docker {
         StringBuilder tmp = new StringBuilder(System.getProperty("os.name").toLowerCase().startsWith("win") ?
                 "powershell.exe -c " : "env -- ");
         buildCmdTemplate = tmp.append("docker build -q -f docker-images/%s.jvm -t quarkus/%s .").toString();
-        runCmdTemplate = "docker run -d -it --rm --name %s -p %s:%s quarkus/%s";
+        runCmdTemplateFromName = "docker run -d -it --rm --name %s -p %s:%s quarkus/%s";
+        runCmdTemplateFromID = "docker run -d -it --rm --name %s -p %s:%s %s";
         saveCmdTemplate = "docker save %s -o docker-images/%s.tar.gz";
         loadCmdTemplate = "docker load -q -i docker-images/%s.tar.gz";
     }
@@ -35,7 +37,7 @@ public class Docker {
                 this.nameDock,
                 this.nameDock).split(" ");
 
-        this.runCmd = String.format(runCmdTemplate,
+        this.runCmd = String.format(runCmdTemplateFromName,
                 application.getDockerInst(),
                 application.getServicePort(),
                 application.getPort(),
@@ -63,4 +65,12 @@ public class Docker {
     public void setSave(String ID) {
         this.saveCmd = String.format(saveCmdTemplate, ID, this.nameDock).split(" ");
     }
+
+	public String[] getAndSetRunCmdFromID(Application app, String string) {
+		return string.format(runCmdTemplateFromID,
+				app.getDockerInst(),
+				app.getServicePort(),
+				app.getPort(),
+				string).split(" ");
+	}
 }

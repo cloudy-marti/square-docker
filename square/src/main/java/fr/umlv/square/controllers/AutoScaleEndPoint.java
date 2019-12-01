@@ -50,7 +50,7 @@ public class AutoScaleEndPoint {
 		try {
 			map = this.data.WrapperStopAutoScale();
 		} catch (IllegalStateException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Non-running AutoScale cannot be stopped").build();
+			return Response.status(Status.BAD_REQUEST).entity("Non-running AutoScale cannot be stopped").build();
 		}
 		return Response.status(Status.OK).entity(map).build();
 	}
@@ -66,7 +66,7 @@ public class AutoScaleEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response status() {
 		if (!data.isAutoScaleRunning()) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Cannot get non-running AutoScale status").build();
+			return Response.status(Status.BAD_REQUEST).entity("Cannot get non-running AutoScale status").build();
 		}
 		var map = data.wrapperUpdateStatus(this.appList);
 		return Response.status(Status.OK).entity(map).build();
@@ -91,9 +91,9 @@ public class AutoScaleEndPoint {
 		try {
 			map = data.updateAutoScale(obj, this.appList);
 		} catch (NumberFormatException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+			return Response.status(Status.BAD_REQUEST).entity("Error with the JSON").build();
 		} catch (IllegalArgumentException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+			return Response.status(Status.BAD_REQUEST).entity("Error with the JSON").build();
 		}
 		return Response.status(Status.OK).entity(map).build();
 	}

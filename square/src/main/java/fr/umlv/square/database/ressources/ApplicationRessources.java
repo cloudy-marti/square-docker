@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import fr.umlv.square.database.entities.Application;
-import fr.umlv.square.repository.ApplicationRepository;
+import fr.umlv.square.database.repository.ApplicationRepository;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped

@@ -82,9 +82,9 @@ public class ApplicationEndPoint {
 		try {
 			return this.deployApp(getFromJson(obj, "app"));
 		} catch (NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+			return Response.status(Status.BAD_REQUEST).entity("Error with the JSON").build();
 		} catch (IllegalStateException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Unbounded port not found").build();
+			return Response.status(Status.BAD_REQUEST).entity("Unbounded port not found").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
@@ -99,7 +99,7 @@ public class ApplicationEndPoint {
 		Application app;
 		if (!this.appList.appAvailable().contains(array[0]))
 			return Response.status(Status.NOT_ACCEPTABLE).entity("Application doesn't exists").build();
-		app = new Application(this.appList.getCount(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
+		app = new Application(this.appList.getCountAndInc(), array[0], Integer.parseInt(array[1]), getUnboundedLocalPort(),
 				array[0] + "-" + (this.appList.getDeployID(array[0], Integer.parseInt(array[1]))));
 		if (!this.deploy.deployApp(app, this.port, this.host, this.path))
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -125,9 +125,9 @@ public class ApplicationEndPoint {
 		try {
 			return this.stopApp(getFromJson(obj, "id")[0]);
 		} catch (NullPointerException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
+			return Response.status(Status.BAD_REQUEST).entity("Container is no longer listed").build();
 		} catch (IndexOutOfBoundsException | NumberFormatException e) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Error with the JSON").build();
+			return Response.status(Status.BAD_REQUEST).entity("Error with the JSON").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("IO Error").build();
 		}
@@ -141,7 +141,7 @@ public class ApplicationEndPoint {
 	private Response stopApp(String idApp) throws IOException {
 		Optional<Application> tmp = appList.getAppById(Integer.parseInt(idApp));
 		if (tmp.isEmpty()) {
-			return Response.status(Status.NOT_ACCEPTABLE).entity("Container is no longer listed").build();
+			return Response.status(Status.BAD_REQUEST).entity("Container is no longer listed").build();
 		}
 		Application tmpApp = tmp.get();
 		if (!stopDockerInstance(tmpApp.getDockerInst(), this.path)) {

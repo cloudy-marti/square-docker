@@ -94,9 +94,9 @@ public class LogEndPoint {
 	public Response logs(@QueryParam("idC") String id, List<JsonObject> obj) {
 		var app = this.listApp.getOneAppRunningByID(id);
 		if (app.isEmpty())
-			Response.status(Status.NOT_ACCEPTABLE).build();
+			Response.status(Status.BAD_REQUEST).build();
 		boolean res = Log.addLogs(obj, app.get());
-		return res ? Response.status(Status.CREATED).build() : Response.status(Status.NOT_ACCEPTABLE).build();
+		return res ? Response.status(Status.CREATED).build() : Response.status(Status.BAD_REQUEST).build();
 	}
 	
 	

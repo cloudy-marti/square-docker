@@ -48,7 +48,6 @@ public class ApplicationsList {
 	public void add(Application a, String str) {
 		synchronized (this.lock) {
 			this.list.add(a);
-			this.idApps.add(1);
 			this.deployCount.get(a.getApp()).incCurrentNumber();
 		}
 	}
@@ -205,5 +204,11 @@ public class ApplicationsList {
 			}
 		}
 		
+	}
+
+	public int getCountAndInc() {
+		synchronized (this.lock) {
+			return this.idApps.inc().getCount();
+		}
 	}
 }

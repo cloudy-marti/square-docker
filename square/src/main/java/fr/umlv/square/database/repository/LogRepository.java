@@ -1,4 +1,4 @@
-package fr.umlv.square.repository;
+package fr.umlv.square.database.repository;
 
 import javax.enterprise.context.ApplicationScoped;
 

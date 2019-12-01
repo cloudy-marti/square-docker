@@ -11,8 +11,8 @@ import javax.transaction.Transactional;
 
 import fr.umlv.square.database.entities.Application;
 import fr.umlv.square.database.entities.Log;
+import fr.umlv.square.database.repository.LogRepository;
 import fr.umlv.square.models.LogsApplication;
-import fr.umlv.square.repository.LogRepository;
 
 @ApplicationScoped
 public class LogRessources {

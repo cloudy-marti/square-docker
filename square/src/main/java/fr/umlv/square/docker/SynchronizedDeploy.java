@@ -3,6 +3,7 @@ package fr.umlv.square.docker;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -41,9 +42,11 @@ public class SynchronizedDeploy {
 	
 	private static boolean tryDeploying(String name, Application app, String port, String host, String path) throws IOException {
 		var docker = new Docker(app);
-		if(!runImage(docker, path, app)) {
+		if(!runImage(docker, path, app, Optional.empty())) {
 			if(!loadAndCallImage(docker, path, app)) {
-				return firstTimeBuild(docker, path, port, host, app);
+				var res = firstTimeBuild(docker, path, port, host, app);
+				DockerDeploy.rmDockerFile(app, path);
+				return res;
 			}
 		}
 		return true;
@@ -54,7 +57,7 @@ public class SynchronizedDeploy {
 		dockerFile.composeDockerFile();
 		if(!buildDockerImage(docker, path, app))
 			return false;
-		if(!runImage(docker, path, app))
+		if(!runImage(docker, path, app, Optional.empty()))
 			return false;
 		return true;
 	}
@@ -62,7 +65,6 @@ public class SynchronizedDeploy {
 	private static boolean buildDockerImage(Docker docker, String path, Application app) throws IOException {
 		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getBuildCmd());
 		if(waitFor(p)) {
-			DockerDeploy.rmDockerFile(app, path);
 			if(!saveImage(p, docker, path)) 
 				return false;
 			
@@ -74,23 +76,41 @@ public class SynchronizedDeploy {
 	}
 
 	private static boolean loadAndCallImage(Docker docker, String path, Application app) throws IOException {
-		if(loadImage(docker, path)) {
-			if(runImage(docker, path, app))
+		Process p = loadImage(docker, path);
+		if(waitFor(p)){
+			String idImage = readLoadOutPut(p);
+			if(runImage(docker, path, app, Optional.of(idImage)))
 				return true;
 		}
 		return false;
 	}
 
-	private static boolean loadImage(Docker docker, String path) throws IOException {
+	private static Process loadImage(Docker docker, String path) throws IOException {
 		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getLoadCmd());
-		return waitFor(p);
+		return p;
 	}
 
-	private static boolean runImage(Docker docker, String path, Application app) throws IOException {
-		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getRunCmd());
+	private static boolean runImage(Docker docker, String path, Application app, Optional<String> idImages) throws IOException {
+		Process p;
+		if(idImages.isEmpty()) {
+			p = DockerDeploy.wrapperCreateStartPB(path, docker.getRunCmd());
+		}
+		else {
+			p = DockerDeploy.wrapperCreateStartPB(path, docker.getAndSetRunCmdFromID(app, idImages.get()));
+		}			
         String stdout = IOUtils.toString(p.getInputStream(), "UTF-8");
         app.setIDContainer(stdout.split("\n")[0]);
 		return waitFor(p);
+	}
+	
+	private static String readLoadOutPut(Process proc) {
+        String output;
+		try {
+			output = IOUtils.toString(proc.getInputStream(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+            throw new AssertionError(e);
+		}
+		return output.substring(output.lastIndexOf(":")+1, output.lastIndexOf("\n"));
 	}
 	
 	private static String readOutPut(Process proc) {
@@ -100,7 +120,7 @@ public class SynchronizedDeploy {
 		} catch (IOException e) {
             throw new AssertionError(e);
 		}
-		var id = output.substring(output.indexOf(":")+1, output.lastIndexOf("\n"));
+		var id = output.substring(output.lastIndexOf(":")+1, output.lastIndexOf("\n"));
 		return id.substring(0,12);
 	}
 	

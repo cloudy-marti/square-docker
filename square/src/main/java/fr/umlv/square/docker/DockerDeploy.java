@@ -61,17 +61,18 @@ public class DockerDeploy {
 	}
 
 	public static void rmDockerFile(Application app, String path){
-		var str = new StringBuilder();
-		var condition = System.getProperty("os.name").toLowerCase().startsWith("win"); 
-		if(condition) {
-			str.append("del");
-		}
-		else {
-			str.append("rm ");
-		}
-		str.append(app.getAppname()).append(app.getPort());
+		String str = "rm docker-images/" + app.getAppname() + app.getPort() + ".jvm";
+		String str2 = "del docker-images/" + app.getAppname() + app.getPort() + ".jvm";
 		try {
-			createAndStartProcessBuilder(path,str.toString().split(" "));
+			var proc = createAndStartProcessBuilder(path,str.split(" "));
+			try {
+				proc.waitFor();
+			} catch (InterruptedException e) {
+				throw new AssertionError();
+			}
+			if(proc.exitValue() != 0) {
+				createAndStartProcessBuilder(path,str2.split(" "));
+			}
 		} catch (IOException e) {
 			return;
 		}
