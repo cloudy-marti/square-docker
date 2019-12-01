@@ -147,10 +147,10 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
-.mvn
 .settings
 bin/
 .classpath
 .project
 
 
+ square/src/main/resources/application.properties
