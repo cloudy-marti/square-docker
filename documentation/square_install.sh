@@ -13,4 +13,4 @@ echo "============== Install mvn =================="
 apt-get install maven
 echo "============================================="
 echo "============== Install Postman ==============" 
-tar -zcvf Postman-linux-x64-7.11.0.tar.gz
+tar -zxvf Postman-linux-x64-7.11.0.tar.gz
