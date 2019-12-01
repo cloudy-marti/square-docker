@@ -23,6 +23,16 @@ public class SynchronizedDeploy {
 			return this.deploySet.add(name);
 	}
 	
+	/**
+	 * This method put in sleep a thread if another is deploying the same app. 
+	 * If the thread doesn't sleep, it deploy app
+	 * @param app 
+	 * @param port
+	 * @param host
+	 * @param path 
+	 * @return
+	 * @throws IOException
+	 */
 	public boolean deployApp(Application app, String port, String host, String path) throws IOException {
 		String name = app.getAppname()+app.getPort();
 		synchronized(this.deploySet){
@@ -40,6 +50,17 @@ public class SynchronizedDeploy {
 		}
 	}	
 	
+	/**
+	 * This method will try to deploy an container. It try to run the image who corresponds to the one it should be if the image exists
+	 * If it doesn't work, 
+	 * @param name
+	 * @param app
+	 * @param port
+	 * @param host
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
 	private static boolean tryDeploying(String name, Application app, String port, String host, String path) throws IOException {
 		var docker = new Docker(app);
 		if(!runImage(docker, path, app, Optional.empty())) {
@@ -52,6 +73,16 @@ public class SynchronizedDeploy {
 		return true;
 	}
 
+	/**
+	 * This method is called if we need to write the dockerFile.
+	 * @param docker
+	 * @param path
+	 * @param port
+	 * @param host
+	 * @param app
+	 * @return
+	 * @throws IOException
+	 */
 	private static boolean firstTimeBuild(Docker docker, String path, String port, String host, Application app) throws IOException {
 		DockerFileCompose dockerFile = new DockerFileCompose(app, port, host, path);
 		dockerFile.composeDockerFile();
@@ -62,6 +93,15 @@ public class SynchronizedDeploy {
 		return true;
 	}
 
+	/**
+	 * This method is called when we build the docker image from the dockerFile
+	 * Then it save the image
+	 * @param docker
+	 * @param path
+	 * @param app
+	 * @return
+	 * @throws IOException
+	 */
 	private static boolean buildDockerImage(Docker docker, String path, Application app) throws IOException {
 		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getBuildCmd());
 		if(waitFor(p)) {
@@ -75,6 +115,15 @@ public class SynchronizedDeploy {
 		return false;
 	}
 
+	/**
+	 * This method is called if the image doesn't exist in the repository of Docker.
+	 * We load our existing image and run it.
+	 * @param docker
+	 * @param path
+	 * @param app
+	 * @return
+	 * @throws IOException
+	 */
 	private static boolean loadAndCallImage(Docker docker, String path, Application app) throws IOException {
 		Process p = loadImage(docker, path);
 		if(waitFor(p)){

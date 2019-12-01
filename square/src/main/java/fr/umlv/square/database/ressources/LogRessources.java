@@ -32,7 +32,7 @@ public class LogRessources {
 	 */
 	@Transactional
 	public ArrayList<LogsApplication> getByTime(OffsetDateTime time){
-		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
+		String queryString = "TIMESTAMP_LOG > ?1";
 		return getData(queryString, time);
 	}
 	
@@ -47,7 +47,7 @@ public class LogRessources {
 	 */
 	public List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
 		int value;
-		String queryString = "TIMESTAMP_LOG > ?1"; //$NON-NLS-1$
+		String queryString = "TIMESTAMP_LOG > ?1";
 		if((value = isNumeric(filter)) > -1) 
 			return getData(queryString, time).stream().filter(e -> value == e.getApplication().getId()).collect(Collectors.toList());
 		
