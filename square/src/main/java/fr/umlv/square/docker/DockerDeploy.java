@@ -34,6 +34,13 @@ public class DockerDeploy {
 		return p;
 	}
 	
+	/**
+	 * This method stop a container
+	 * @param dockerInstance the name of the container
+	 * @param path path from where we will start the processBuilder
+	 * @return
+	 * @throws IOException
+	 */
 	public static boolean stopDockerInstance(String dockerInstance, String path) throws IOException {
 		Objects.requireNonNull(dockerInstance);
 		Process stopProcess = createAndStartProcessBuilder(
@@ -48,6 +55,10 @@ public class DockerDeploy {
 		return stopProcess.exitValue() == 0;
 	}
 
+	/**
+	 * This method returns a list containing all docker-instance name running
+	 * @return
+	 */
 	public static List<String> getRunningInstancesNames() {
 		ProcessBuilder dockerPs = new ProcessBuilder(("docker ps --format '{{.Names}}'").split(" "));
 		String output;
@@ -60,6 +71,11 @@ public class DockerDeploy {
 		return Arrays.asList(output.replace("'", "").split("\n"));
 	}
 
+	/**
+	 * This method delete a dockerFile. Try it first with linux command, then with windows.
+	 * @param app the application so we can retrieve the name of the dockerFile.
+	 * @param path, the path from where we are to go to docker-images directory
+	 */
 	public static void rmDockerFile(Application app, String path){
 		String str = "rm docker-images/" + app.getAppname() + app.getPort() + ".jvm";
 		String str2 = "del docker-images/" + app.getAppname() + app.getPort() + ".jvm";
@@ -77,6 +93,11 @@ public class DockerDeploy {
 			return;
 		}
 	}
+		
+	/**
+	 * This method get a free port for the application we want to deploy
+	 * @return the port	
+	 */
 	public static int getUnboundedLocalPort() {
 		try (ServerSocket socket = new ServerSocket()) {
 			socket.bind(new InetSocketAddress(0));

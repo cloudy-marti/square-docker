@@ -1,20 +1,9 @@
 package fr.umlv.square.docker;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Test;
 
 import fr.umlv.square.database.entities.Application;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Scanner;
-import java.util.StringJoiner;
-
-import javax.inject.Inject;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DockerFileComposeTest {

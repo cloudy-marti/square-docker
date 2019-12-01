@@ -1,8 +1,6 @@
 package fr.umlv.square.docker;
 
 import java.util.Objects;
-import java.util.StringJoiner;
-
 import fr.umlv.square.database.entities.Application;
 
 public class Docker {
@@ -13,6 +11,9 @@ public class Docker {
     private static final String saveCmdTemplate;
     private static final String loadCmdTemplate;
 
+    /**
+     * Create all String we need to process on the deployment of a container
+     */
     static {
         StringBuilder tmp = new StringBuilder(System.getProperty("os.name").toLowerCase().startsWith("win") ?
                 "powershell.exe -c " : "env -- ");
@@ -66,11 +67,17 @@ public class Docker {
         this.saveCmd = String.format(saveCmdTemplate, ID, this.nameDock).split(" ");
     }
 
-	public String[] getAndSetRunCmdFromID(Application app, String string) {
-		return string.format(runCmdTemplateFromID,
+    /**
+     * This method will create the command we need to run to start a container with the image's ID
+     * @param app application to set port and name.
+     * @param id the image's ID
+     * @return String[]
+     */
+	public String[] getAndSetRunCmdFromID(Application app, String id) {
+		return String.format(runCmdTemplateFromID,
 				app.getDockerInst(),
 				app.getServicePort(),
 				app.getPort(),
-				string).split(" ");
+				id).split(" ");
 	}
 }

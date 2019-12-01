@@ -17,6 +17,11 @@ public class AutoScale {
 	private static final String actionTemplate;
 	private static final String noAction;
 
+	/**
+	 * Enum for the lock
+	 * @author FAU
+	 *
+	 */
 	enum IsUpToDate {
 		FALSE, TRUE, IN_PROGRESS
 	}
@@ -35,6 +40,10 @@ public class AutoScale {
 	private boolean running;
 	private boolean isFree;
 
+	/**
+	 * 
+	 * @param appList injected ApplicationsList
+	 */
 	@Inject
 	public AutoScale(ApplicationsList appList) {
 		synchronized (this.lock) {
@@ -45,6 +54,10 @@ public class AutoScale {
 		}
 	}
 
+	/**
+	 * Return what autoscale need to do
+	 * @return
+	 */
 	public Map<String, Integer> getAutoScale() {
 		synchronized (this.lock) {
 			return this.autoScale;
@@ -71,6 +84,10 @@ public class AutoScale {
 		this.statusMap.put(key, value);
 	}
 
+	/**
+	 * Return what the auto scale need to do for each applications as a String
+	 * @return
+	 */
 	private Map<String, String> getStatusMap() {
 		synchronized (this.lock) {
 			return this.statusMap;
@@ -112,6 +129,12 @@ public class AutoScale {
 
 	}
 
+	/**
+	 * Set the auto-scale to up. Only one thread can update it at a time
+	 * @param obj, the json who contains what the auto scale need to do for each apps
+	 * @param appList
+	 * @return
+	 */
 	public Map<String, String> updateAutoScale(JsonObject obj, ApplicationsList appList) {
 		synchronized (this.lock) {
 			this.autoScale.clear();
@@ -124,6 +147,11 @@ public class AutoScale {
 		}
 	}
 
+	/**
+	 * Wrapper to update the status
+	 * @param appList
+	 * @return
+	 */
 	public Map<String, String> wrapperUpdateStatus(ApplicationsList appList) {
 		synchronized (this.lock) {
 			this.updateStatus(appList);
@@ -149,6 +177,10 @@ public class AutoScale {
 		}
 	}
 
+	/**
+	 * Wrapper to stop autoScale
+	 * @return a map containing what the auto scale is setup for
+	 */
 	public Map<String, Integer> WrapperStopAutoScale() {
 		synchronized (this.lock) {
 			this.stopAutoScale();
@@ -156,6 +188,11 @@ public class AutoScale {
 		}
 	}
 
+	/**
+	 * This method try to update the autoScale. Only one thread can do it at a time
+	 * Calling checkIsFree() to see if he can update
+	 * @return
+	 */
 	public Map<String, Integer> tryUpdating() {
 		synchronized (this.lock) {
 			var map = new HashMap<String, Integer>();
@@ -171,6 +208,9 @@ public class AutoScale {
 		}
 	}
 
+	/**
+	 * This method put in sleep threads while one is updating the auto-scale.
+	 */
 	private void checkIsFree() {
 		synchronized (this.lock) {
 			if(this.isFree) {
