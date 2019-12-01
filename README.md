@@ -6,8 +6,4 @@ Authors :
     
 The aim of this project is to develop a Kubernetes-like application, used for automating application deployment, scaling and management.
 
-oct.27 Release :
-* JSON Serialize / Deserialize functions with Quarkus
-* Hello app done with Quarkus and deployed with Docker
-    * sudo docker build -f docker-images/Dockerfile.jvm -t quarkus/projectsquare-jvm .
-    * sudo docker run -i --rm -p 8080:8080 quarkus/projectsquare-jvm
+Please refer to the technical documentation and the user guide that can be found on the documentation directory.
