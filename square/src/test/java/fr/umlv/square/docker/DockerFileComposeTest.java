@@ -7,9 +7,6 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DockerFileComposeTest {
-	
-	
-	
 
     @Test
     void dockerFileComposeWithNullAppShouldThrowNullPointerException () {

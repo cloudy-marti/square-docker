@@ -21,8 +21,10 @@ public class SynchronizedCounter {
 			this.count = count;
 		}
 	}
-	
-	
+
+	/**
+	 * ApplicationScoped needed constructor
+	 */
 	public SynchronizedCounter(){}
 
 	public SynchronizedCounter inc() {
@@ -35,12 +37,6 @@ public class SynchronizedCounter {
 	public void add(int c) {
 		synchronized (this.lock) {
 			this.count+=c;
-		}
-	}
-	
-	public void UpdateCurrentCounter(int number) {
-		synchronized (this.lock) {
-			this.currentNumber = number;
 		}
 	}
 	

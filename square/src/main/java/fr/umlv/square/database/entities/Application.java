@@ -1,18 +1,13 @@
 package fr.umlv.square.database.entities;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
@@ -43,9 +38,6 @@ public class Application extends PanacheEntity {
 	@Column(name = "IS_ACTIVE", nullable = false)
 	private Boolean isActive = true;
 
-	@OneToMany(mappedBy = "app", cascade = CascadeType.ALL)
-	Set<Log> allLogs = new HashSet<Log>();
-
 	/**
 	 * Default constructor for BDD
 	 */
@@ -74,11 +66,6 @@ public class Application extends PanacheEntity {
 		return this.app;
 	}
 
-	@JsonbTransient
-	public String getIdCondtainer() {
-		return this.idContainer;
-	}
-
 	public String getApp() {
 		return this.app + ':' + this.port;
 	}
@@ -104,27 +91,24 @@ public class Application extends PanacheEntity {
 	public boolean isActive() {
 		return this.isActive;
 	}
-	
+
 	public void setActive(boolean res) {
 		this.isActive = res;
 	}
 
-
 	/**
 	 * This method create a Json from an Application
 	 * @return String which correponds to the Json of the Application
-	 * @param Application
+	 * @param obj Application to be serialized
 	 */
 	public static JsonObject serialize(Application obj) {
-		JsonObject value = 
-				Json.createObjectBuilder().
+		return  Json.createObjectBuilder().
 				add("id", obj.getId()).
 		        add("app", obj.getApp()).
 		        add("port", obj.getPort()).
 		        add("service-port", obj.getServicePort()).
 		        add("docker-instance", obj.getDockerInst()).
 		        build();
-		return value;
 	}
 
 	public void setIDContainer(String string) {
@@ -134,14 +118,10 @@ public class Application extends PanacheEntity {
 	/**
 	 * This method checks if an ID matches with the ID of the application (this)
 	 * @return true if it matches
-	 * @param String id we gonna check
+	 * @param id id we gonna check
 	 */
 	public boolean matchesWithID(String id) {
 		Pattern pattern = Pattern.compile("^".concat(id).concat(".*"));
 		return pattern.matcher(this.idContainer).matches();
-	}
-
-	public void update() {
-		this.flush();	
 	}
 }

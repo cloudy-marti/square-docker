@@ -17,7 +17,6 @@ import fr.umlv.square.models.LogsApplication;
 @ApplicationScoped
 public class LogRessources {
 	
-	
 	private final LogRepository repo;
 	
 	@Inject
@@ -28,7 +27,7 @@ public class LogRessources {
 	/**
 	 * This method get all the logs in the Databases after a specific date.
 	 * @return ArrayList<LogsApplication>
-	 * @param OffsetDateTime from which logs are retrieved
+	 * @param time from which logs are retrieved
 	 */
 	@Transactional
 	public ArrayList<LogsApplication> getByTime(OffsetDateTime time){
@@ -43,9 +42,8 @@ public class LogRessources {
 	 * @return List<LogsApplication>
 	 * @param time : OffsetDateTime from which logs are retrieved 
 	 * @param filter : String which is a filter
-	 * @throws IllegalArgumentException
 	 */
-	public List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter){
+	public List<LogsApplication> getByTimeAndFilter(OffsetDateTime time, String filter) {
 		int value;
 		String queryString = "TIMESTAMP_LOG > ?1";
 		if((value = isNumeric(filter)) > -1) 
@@ -61,15 +59,12 @@ public class LogRessources {
 	}
 
 
-	private ArrayList<LogsApplication> getData(String queryString, Object... params){
+	private ArrayList<LogsApplication> getData(String queryString, Object... params) {
 		List<Log> query = this.repo.list(queryString,params);
-		ArrayList<LogsApplication> array= new ArrayList<LogsApplication>();
-		query.forEach(e -> {
-				array.add(new LogsApplication(e.getApp(), e.getMessage(),e.getTimeStamp().toString()));
-		});	
+		ArrayList<LogsApplication> array= new ArrayList<>();
+		query.forEach(e -> array.add(new LogsApplication(e.getApp(), e.getMessage(),e.getTimeStamp().toString())));
 		return array;
 	}
-	
 	
 	private boolean isName(String filter) {
 		var array = filter.split(":");
@@ -87,8 +82,7 @@ public class LogRessources {
 	
 	private int isNumeric(String filter) {
 		try {
-			var value = Integer.parseInt(filter);
-			return value;
+			return Integer.parseInt(filter);
 		}
 		catch(NumberFormatException e) {
 			return -1;
@@ -97,7 +91,7 @@ public class LogRessources {
 
 	/**
 	 * This method update a Applications passed in the list.
-	 * @param List<Application>
+	 * @param appToDisable
 	 */
 	@Transactional
 	public void disableApp(List<Application> appToDisable) {

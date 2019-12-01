@@ -17,8 +17,6 @@ public class DockerFileCompose {
     private String dockerFileBuffer;
     private final String port;
     private final String host;
-    
-
 
     static {
         dockerFileTemplate =
@@ -44,7 +42,7 @@ public class DockerFileCompose {
                 "\nCMD curl -f http://localhost:%s || exit 1";
     }
 
-    public DockerFileCompose(Application application, String port, String host, String path) throws IOException {
+    public DockerFileCompose(Application application, String port, String host, String path) {
         Objects.requireNonNull(application);
         this.application = application;
         this.port = port;

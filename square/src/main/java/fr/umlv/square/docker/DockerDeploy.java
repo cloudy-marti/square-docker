@@ -2,7 +2,6 @@ package fr.umlv.square.docker;
 
 import org.apache.commons.io.IOUtils;
 
-
 import fr.umlv.square.database.entities.Application;
 
 import java.io.File;
@@ -30,15 +29,14 @@ public class DockerDeploy {
 	 * @throws IOException
 	 */
 	public static Process wrapperCreateStartPB(String path, String...cmdLine) throws IOException {
-		var p = createAndStartProcessBuilder(path, cmdLine);
-		return p;
+		return createAndStartProcessBuilder(path, cmdLine);
 	}
 	
 	/**
 	 * This method stop a container
 	 * @param dockerInstance the name of the container
 	 * @param path path from where we will start the processBuilder
-	 * @return
+	 * @return boolean
 	 * @throws IOException
 	 */
 	public static boolean stopDockerInstance(String dockerInstance, String path) throws IOException {
@@ -57,7 +55,7 @@ public class DockerDeploy {
 
 	/**
 	 * This method returns a list containing all docker-instance name running
-	 * @return
+	 * @return List of running container's names
 	 */
 	public static List<String> getRunningInstancesNames() {
 		ProcessBuilder dockerPs = new ProcessBuilder(("docker ps --format '{{.Names}}'").split(" "));

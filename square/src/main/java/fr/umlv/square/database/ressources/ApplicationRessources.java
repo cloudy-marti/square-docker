@@ -34,7 +34,7 @@ public class ApplicationRessources {
 	 * This method set as false a field in an Application and save it in the
 	 * Databases
 	 * 
-	 * @param the Application we want to midifie
+	 * @param tmpApp Application we want to midifie
 	 */
 	@Transactional
 	public void disableOneApp(Application tmpApp) {

@@ -42,7 +42,6 @@ public class AutoScaleEndPoint {
 
 	/**
 	 * Stop AutoScale manager.
-	 * 
 	 * @return Response
 	 */
 	@Transactional
@@ -61,7 +60,6 @@ public class AutoScaleEndPoint {
 
 	/**
 	 * Get last AutoScale actions.
-	 * 
 	 * @return Response
 	 */
 	@Transactional
@@ -78,7 +76,6 @@ public class AutoScaleEndPoint {
 
 	/**
 	 * Start or update AutoScale manager.
-	 * 
 	 * @param obj : JsonObject to be deserialized that contains the information of
 	 *            the apps and their instances wanted.
 	 * @return Response
@@ -117,7 +114,7 @@ public class AutoScaleEndPoint {
 	}
 
 	private void updateApps(String appName, int number, boolean isLast) {
-		String array[] = appName.split(":");
+		String[] array = appName.split(":");
 		if (number < 0) {
 			for (int i = 0; i > number; i--) {
 				this.deployApp(array);

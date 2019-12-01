@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-
 import org.apache.commons.io.IOUtils;
 
 import fr.umlv.square.database.entities.Application;
@@ -30,7 +29,7 @@ public class SynchronizedDeploy {
 	 * @param port
 	 * @param host
 	 * @param path 
-	 * @return
+	 * @return boolean
 	 * @throws IOException
 	 */
 	public boolean deployApp(Application app, String port, String host, String path) throws IOException {
@@ -57,8 +56,8 @@ public class SynchronizedDeploy {
 	 * @param app
 	 * @param port
 	 * @param host
-	 * @param path
-	 * @return
+	 * @param path path to saved docker image
+	 * @return boolean whether we could deploy or not
 	 * @throws IOException
 	 */
 	private static boolean tryDeploying(String name, Application app, String port, String host, String path) throws IOException {
@@ -80,7 +79,7 @@ public class SynchronizedDeploy {
 	 * @param port
 	 * @param host
 	 * @param app
-	 * @return
+	 * @return boolean
 	 * @throws IOException
 	 */
 	private static boolean firstTimeBuild(Docker docker, String path, String port, String host, Application app) throws IOException {
@@ -99,7 +98,7 @@ public class SynchronizedDeploy {
 	 * @param docker
 	 * @param path
 	 * @param app
-	 * @return
+	 * @return boolean
 	 * @throws IOException
 	 */
 	private static boolean buildDockerImage(Docker docker, String path, Application app) throws IOException {
@@ -118,10 +117,10 @@ public class SynchronizedDeploy {
 	/**
 	 * This method is called if the image doesn't exist in the repository of Docker.
 	 * We load our existing image and run it.
-	 * @param docker
-	 * @param path
-	 * @param app
-	 * @return
+	 * @param docker Docker object to be deployed
+	 * @param path Path of the image
+	 * @param app Application to be deployed
+	 * @return boolean
 	 * @throws IOException
 	 */
 	private static boolean loadAndCallImage(Docker docker, String path, Application app) throws IOException {
@@ -135,8 +134,7 @@ public class SynchronizedDeploy {
 	}
 
 	private static Process loadImage(Docker docker, String path) throws IOException {
-		Process p = DockerDeploy.wrapperCreateStartPB(path, docker.getLoadCmd());
-		return p;
+		return DockerDeploy.wrapperCreateStartPB(path, docker.getLoadCmd());
 	}
 
 	private static boolean runImage(Docker docker, String path, Application app, Optional<String> idImages) throws IOException {
@@ -147,7 +145,7 @@ public class SynchronizedDeploy {
 		else {
 			p = DockerDeploy.wrapperCreateStartPB(path, docker.getAndSetRunCmdFromID(app, idImages.get()));
 		}			
-        String stdout = IOUtils.toString(p.getInputStream(), "UTF-8");
+        String stdout = IOUtils.toString(p.getInputStream(), StandardCharsets.UTF_8);
         app.setIDContainer(stdout.split("\n")[0]);
 		return waitFor(p);
 	}

@@ -8,7 +8,6 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.HttpHeaders;
-import java.io.IOException;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.core.Is.is;
 
@@ -18,7 +17,7 @@ public class endPointeTest {
 
 	@Test
 	@Order(1)
-	void testAppListEmpty() throws IOException {
+	void testAppListEmpty() {
 		get("/app/list").then().statusCode(HttpStatus.SC_OK)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.body("size()", is(0));
@@ -57,7 +56,7 @@ public class endPointeTest {
 	
 	@Test
 	@Order(3)
-	void testAppListWith1Deploy() throws IOException {
+	void testAppListWith1Deploy() {
 		get("/app/list").then().statusCode(HttpStatus.SC_OK)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.statusCode(HttpStatus.SC_OK)
@@ -80,7 +79,7 @@ public class endPointeTest {
 	
 	@Test
 	@Order(5)
-	void testAppListWith2Deploy() throws IOException {
+	void testAppListWith2Deploy() {
 		get("/app/list").then().statusCode(HttpStatus.SC_OK)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.statusCode(HttpStatus.SC_OK)

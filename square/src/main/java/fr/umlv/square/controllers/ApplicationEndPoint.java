@@ -171,8 +171,8 @@ public class ApplicationEndPoint {
 
 	/**
 	 * this method return an array of string get from a JsonObject.
-	 * @param obj
-	 * @param key
+	 * @param obj JsonObject that contains the data
+	 * @param key Key whose value we want
 	 * @return array of string
 	 */
 	public static String[] getFromJson(JsonObject obj, String key) {

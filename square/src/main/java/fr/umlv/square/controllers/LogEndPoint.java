@@ -49,7 +49,7 @@ public class LogEndPoint {
 	/**
 	 * This endPoint return logs filtered by a date.
 	 * @return Response.
-	 * @param Int, in minutes the time we will withdraw right now
+	 * @param time in minutes the time we will withdraw right now
 	 */
 	@Path("/{time}")
 	@GET
@@ -65,7 +65,7 @@ public class LogEndPoint {
 	 * This endPoint return logs filtered by a date and a filter.
 	 * @return Response.
 	 * @param time, in minutes the time we will withdraw right now
-	 * @Param filter, the filter we gonna apply on the selected logs.
+	 * @param filter, the filter we gonna apply on the selected logs.
 	 * 
 	 */
 	@Path("/{time}/{filter}")
@@ -81,7 +81,7 @@ public class LogEndPoint {
 	 * This endPoint save logs in the database.
 	 * @return Response.
 	 * @param id, the id of the application to which the logs belong 
-	 * @Param obj, a list of JsonObject who are the logs
+	 * @param obj, a list of JsonObject who are the logs
 	 * 
 	 */
 	@Path("")

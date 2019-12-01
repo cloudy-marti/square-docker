@@ -23,7 +23,7 @@ import fr.umlv.square.utils.SynchronizedCounter;
 @ApplicationScoped
 public class ApplicationsList {
 	enum IsUpToDate {
-		FALSE, TRUE, IN_PROGRESS
+		TRUE, IN_PROGRESS
 	}
 
 	private final ArrayList<Application> list = new ArrayList<>();
@@ -67,20 +67,6 @@ public class ApplicationsList {
 		}
 	}
 
-
-	/**
-	 * 
-	 * @param dockerInstance, the docker instance name of the app
-	 * @return an Optional<Applicaton>
-	 */
-	public Optional<Application> getOneAppRunning(String dockerInstance) {
-		synchronized (this.lock) {
-			Optional<Application> op = this.list.stream().filter(e -> dockerInstance.equals(e.getDockerInst()))
-					.findFirst();
-			return op;
-		}
-	}
-
 	/**
 	 * 
 	 * @param id of the app
@@ -98,8 +84,8 @@ public class ApplicationsList {
 
 	/**
 	 * This methods returns the ID of the container depending on the name of the app and her port
-	 * @param appName
-	 * @param port
+	 * @param appName name of the Application
+	 * @param port port exposed by container
 	 * @return the id that the app will have
 	 */
 	public int getDeployID(String appName, int port) {
@@ -144,12 +130,6 @@ public class ApplicationsList {
 		synchronized (this.lock) {
 			var c = this.deployCount.get(name);
 			return c != null ? c.getCurrentNumber() : 0;
-		}
-	}
-
-	public int getCount() {
-		synchronized (this.lock) {
-			return this.idApps.getCount();
 		}
 	}
 
@@ -217,7 +197,7 @@ public class ApplicationsList {
 
 	private void initHashMap(List<Application> list) {
 		var copy = new ArrayList<>(list);
-		List<Application> tmp = new ArrayList<>();
+		List<Application> tmp;
 		while(!copy.isEmpty()) {
 			var elem = copy.get(0);
 			tmp = copy.stream().filter(e -> e.getApp().equals(elem.getApp())).collect(Collectors.toList());

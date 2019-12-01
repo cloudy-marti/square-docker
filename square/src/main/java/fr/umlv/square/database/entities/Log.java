@@ -52,7 +52,7 @@ public class Log extends PanacheEntity {
 	 * @param obj : List<JsonObject>, from this list we will Log and push it to the databases
 	 */
 	public static boolean addLogs(List<JsonObject> obj, Application app) {
-		ArrayList <Log> l = new ArrayList<Log>();
+		ArrayList <Log> l = new ArrayList<>();
 		for(JsonObject elem : obj) {
 			String message = String.valueOf(elem.get("message")); //$NON-NLS-1$
 			String defaultDate = elem.get("date").toString().replace('"',' ').trim(); //$NON-NLS-1$

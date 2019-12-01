@@ -29,7 +29,7 @@ public class LogsApplication {
 	/**
 	 * This method serialize a list of LogsApplication.
 	 * @return String which is the Json of the List.
-	 * @param List<LogsApplication> 
+	 * @param list List of logs
 	 */
 	public static ArrayList<JsonObject> listToJson(List<LogsApplication>list){
 		ArrayList<JsonObject> array = new ArrayList<>(list.size());
@@ -55,15 +55,5 @@ public class LogsApplication {
 	@JsonbTransient
 	public Application getApplication() {
 		return this.app;
-	}
-	
-	@JsonbTransient
-	public String getMessage() {
-		return this.message;
-	}
-	
-	@JsonbTransient
-	public String getTimestamp() {
-		return this.timestamp;
 	}
 }

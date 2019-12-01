@@ -34,7 +34,7 @@ public class AppLifecycleBean {
 	}
 
 	@Transactional
-	void onStart(@Observes StartupEvent ev) throws InterruptedException {
+	void onStart(@Observes StartupEvent ev) {
 		this.app.wrapperInit();
 		new Thread(() -> {
 			while (true) {

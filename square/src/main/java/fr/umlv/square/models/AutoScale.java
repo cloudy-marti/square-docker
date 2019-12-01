@@ -17,15 +17,6 @@ public class AutoScale {
 	private static final String actionTemplate;
 	private static final String noAction;
 
-	/**
-	 * Enum for the lock
-	 * @author FAU
-	 *
-	 */
-	enum IsUpToDate {
-		FALSE, TRUE, IN_PROGRESS
-	}
-
 	static {
 		actionTemplate = "need to %s %s instance(s)";
 		noAction = "no action";
@@ -54,28 +45,6 @@ public class AutoScale {
 		}
 	}
 
-	/**
-	 * Return what autoscale need to do
-	 * @return
-	 */
-	public Map<String, Integer> getAutoScale() {
-		synchronized (this.lock) {
-			return this.autoScale;
-		}
-	}
-
-	public void addToAutoScale(String key, int value) {
-		synchronized (this.lock) {
-			this.autoScale.put(key, value);
-		}
-	}
-
-	public Map<String, Integer> getMap() {
-		synchronized (this.lock) {
-			return this.autoScale;
-		}
-	}
-
 	private void clearStatus() {
 		this.statusMap.clear();
 	}
@@ -86,7 +55,7 @@ public class AutoScale {
 
 	/**
 	 * Return what the auto scale need to do for each applications as a String
-	 * @return
+	 * @return StatusMap
 	 */
 	private Map<String, String> getStatusMap() {
 		synchronized (this.lock) {
@@ -97,12 +66,6 @@ public class AutoScale {
 	public boolean isAutoScaleRunning() {
 		synchronized (this.lock) {
 			return this.running;
-		}
-	}
-
-	public void startAutoScale() {
-		synchronized (this.lock) {
-			this.running = true;
 		}
 	}
 
@@ -132,8 +95,8 @@ public class AutoScale {
 	/**
 	 * Set the auto-scale to up. Only one thread can update it at a time
 	 * @param obj, the json who contains what the auto scale need to do for each apps
-	 * @param appList
-	 * @return
+	 * @param appList List of all applications
+	 * @return Map needed by the autoscale
 	 */
 	public Map<String, String> updateAutoScale(JsonObject obj, ApplicationsList appList) {
 		synchronized (this.lock) {
@@ -149,8 +112,8 @@ public class AutoScale {
 
 	/**
 	 * Wrapper to update the status
-	 * @param appList
-	 * @return
+	 * @param appList List of all Applications
+	 * @return Map of the autoscale
 	 */
 	public Map<String, String> wrapperUpdateStatus(ApplicationsList appList) {
 		synchronized (this.lock) {
@@ -191,7 +154,7 @@ public class AutoScale {
 	/**
 	 * This method try to update the autoScale. Only one thread can do it at a time
 	 * Calling checkIsFree() to see if he can update
-	 * @return
+	 * @return Map of the instances needed by the autoscale
 	 */
 	public Map<String, Integer> tryUpdating() {
 		synchronized (this.lock) {
@@ -217,7 +180,7 @@ public class AutoScale {
 				this.isFree = false;
 			}
 			else{
-				while(this.isFree == false) {
+				while(!this.isFree) {
 					try {
 						this.lock.wait();
 					} catch (InterruptedException e) {

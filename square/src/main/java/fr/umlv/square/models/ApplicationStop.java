@@ -21,12 +21,11 @@ public class ApplicationStop {
 	public Application getApp() {
 		return this.app;
 	}
-		
 
 	/**
 	 * This method serializes a Stop object.
 	 * @return String which is the Json of the Object.
-	 * @param ApplicationStop object we will serialize
+	 * @param obj object we will serialize
 	 */
 	public static JsonObject serialize(ApplicationStop obj) {
 		JsonObject value = 
