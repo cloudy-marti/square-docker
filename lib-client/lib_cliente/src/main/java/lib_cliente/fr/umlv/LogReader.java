@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,6 +26,7 @@ public class LogReader {
 	private final String id;
 	private final String localIP;
 	private final int portSquare;
+	private Long lastRead = 0L;
 	
 
 	public LogReader() {
@@ -63,6 +65,7 @@ public class LogReader {
         OffsetDateTime time = OffsetDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
 		stream.skip(read).forEach(e -> this.parse(e, time));
 		sendData();
+		lastRead = read;
 		read += Long.valueOf(array.size());
 		array.clear();
 
@@ -79,7 +82,10 @@ public class LogReader {
 					.POST(BodyPublishers.ofString(obj))
 					.build();
 			try {
-				HttpClient.newHttpClient().send(requetePost, BodyHandlers.ofString());				
+				HttpResponse<String> resp = HttpClient.newHttpClient().send(requetePost, BodyHandlers.ofString());
+				if(resp.statusCode() < 200 || resp.statusCode() > 299) {
+					read = lastRead;
+				}
 			} catch (IOException | InterruptedException e) {
 				return;
 			}

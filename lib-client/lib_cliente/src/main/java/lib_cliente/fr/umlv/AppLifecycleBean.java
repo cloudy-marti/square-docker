@@ -1,8 +1,6 @@
 package lib_cliente.fr.umlv;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
