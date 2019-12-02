@@ -42,10 +42,15 @@ public class SynchronizedDeploy {
 					return false;
 				}
 			}
-			var res = tryDeploying(name, app, port, host, path);
+		}
+		
+		var res = tryDeploying(name, app, port, host, path);
+
+		synchronized (this.deploySet) {
 			this.deploySet.notifyAll();
 			this.deploySet.remove(name);
 			return res;
+		
 		}
 	}	
 	
